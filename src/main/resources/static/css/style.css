@@ -1,0 +1,244 @@
+.topmenu {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #00001d;
+    padding: clamp(10px, 2vw, 20px);
+    /* Fjernet fast høyde på topmenu */
+}
+
+.topmenu img {
+    /* Endret fra prosent til faste størrelser med clamp */
+    height: clamp(60px, 15vw, 160px);
+    width: auto;
+    object-fit: contain;
+}
+
+/* Hamburger-meny styling */
+.hamburger-menu {
+    position: relative;
+}
+
+.hamburger {
+    cursor: pointer;
+    padding: clamp(8px, 1.5vw, 15px);
+    z-index: 100;
+}
+
+.hamburger span {
+    display: block;
+    width: clamp(25px, 3vw, 40px);
+    height: clamp(2px, 0.4vw, 4px);
+    background-color: aliceblue;
+    margin: clamp(4px, 0.8vw, 8px) 0;
+    transition: 0.4s;
+}
+
+/* Hamburger animasjon */
+.hamburger.active span:nth-child(1) {
+    transform: rotate(-45deg) translate(calc(-1 * clamp(4px, 0.8vw, 8px)), clamp(4px, 0.8vw, 8px));
+}
+
+.hamburger.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger.active span:nth-child(3) {
+    transform: rotate(45deg) translate(calc(-1 * clamp(4px, 0.8vw, 8px)), calc(-1 * clamp(4px, 0.8vw, 8px)));
+}
+
+/* Meny-items styling */
+.menu-items {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: navy;
+    padding: clamp(15px, 2vw, 30px);
+    min-width: clamp(180px, 25vw, 300px);
+    display: none;
+    flex-direction: column;
+    gap: clamp(10px, 1.5vw, 20px);
+    border-radius: 0 0 5px 5px;
+}
+
+.menu-items.active {
+    display: flex;
+}
+
+.menu-items a {
+    color: aliceblue;
+    text-decoration: none;
+    font-size: clamp(18px, 2.5vw, 32px);
+    padding: clamp(8px, 1vw, 15px);
+}
+
+.menu-items a:hover {
+    background-color: rgba(240, 248, 255, 0.1);
+}
+
+/* Legg til media queries for ytterligere kontroll */
+@media screen and (max-width: 768px) {
+    .menu-items {
+        width: 100vw;
+        left: 0;
+        right: 0;
+        text-align: center;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .topmenu {
+        padding: 8px;
+    }
+
+    .hamburger span {
+        width: 22px;
+        height: 2px;
+        margin: 4px 0;
+    }
+}
+
+/* Behold eksisterende topmenu og hamburger-meny CSS */
+
+.welcome-section {
+    min-height: calc(100vh - clamp(60px, 15vw, 120px));
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.hero {
+    background: url('/imgs/bringeber.jpg') center;
+    background-size: cover;
+    height: 60vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-align: center;
+    padding: 2rem;
+}
+
+.hero h1 {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.hero p {
+    font-size: clamp(1.2rem, 2vw, 2rem);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.description-section {
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.description-section p {
+    font-size: clamp(1rem, 1.5vw, 1.2rem);
+    line-height: 1.6;
+    color: #333;
+}
+
+@media (max-width: 768px) {
+    .description-section {
+        padding: 1.5rem;
+    }
+}
+
+.products-section {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.products-section h1 {
+    text-align: center;
+    font-size: clamp(2rem, 4vw, 3rem);
+    margin-bottom: 2rem;
+    color: #333;
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+}
+
+.product-card {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.product-image {
+    width: 100%;
+    height: 250px;
+    overflow: hidden;
+}
+
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.product-info {
+    padding: 1.5rem;
+}
+
+.product-info h2 {
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.product-description {
+    font-size: 0.95rem;
+    color: #666;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+}
+
+.product-price {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #00001d;
+    margin-bottom: 1rem;
+}
+
+.btn-details {
+    display: inline-block;
+    background-color: navy;
+    color: aliceblue;
+    padding: 0.7rem 1.5rem;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-details:hover {
+    background-color: #00001d;
+}
+
+@media (max-width: 768px) {
+    .products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .products-section {
+        padding: 1rem;
+    }
+}
