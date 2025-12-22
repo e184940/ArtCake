@@ -1,3 +1,4 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="no">
 <head>
@@ -7,7 +8,9 @@
 </head>
 <body>
 <div class="topmenu">
-    <img src="/imgs/logo-no-bg.png" href="/">
+    <a href="/" class="logo-link">
+        <img src="/imgs/logo-no-bg.png" alt="ArtCake AS">
+    </a>
     <div class="hamburger-menu">
         <div class="hamburger">
             <span></span>
