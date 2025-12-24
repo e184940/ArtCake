@@ -28,7 +28,7 @@
 </div>
 
 <main class="products-section">
-    <h1>Vårt utvalg av kaker</h1>
+    <h1>Vårt utvalg av kaker og bakst</h1>
 
     <div class="products-grid">
         <c:forEach var="cake" items="${cakes}">

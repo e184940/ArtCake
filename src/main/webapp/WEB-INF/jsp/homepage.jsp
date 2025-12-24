@@ -33,9 +33,9 @@
     </div>
 
     <div class="description-section">
-        <p><strong>Art Cake studio</strong> er et lite lokslt konditori</p>
+        <p><strong>Art Cake studio</strong> er et lite lokalt konditori</p>
         <p>Vi bruker lokale ingredienser, og følger lengestående, og tradisjonelle familie-oppskrifter.</p>
-        <p>Alt vi gjør, gjør vi med formål om å; lage de <strong>deiligste kakene</strong> du noensinne har smakt!</p>
+        <p>Alt vi gjør, gjør vi med formål om å lage de <strong>deiligste kakene</strong> du noensinne har smakt!</p>
         <p>Vi lager alt fra store saftige honningkaker, til små deilige sjokoloadekaker.</p>
         <p>Fine kaker med personlige meldinger eller pynt ordner vi selvsagt også!</p>
     </div>
