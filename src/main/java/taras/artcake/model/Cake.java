@@ -4,8 +4,10 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -41,6 +43,16 @@ public class Cake {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "cake", cascade = CascadeType.ALL)
+    private List<CakeSize> sizes;
+
+    public BigDecimal getMinPrice() {
+        return sizes.stream()
+                .map(CakeSize::getPrice)
+                .min(BigDecimal::compareTo)
+                .orElse(BigDecimal.ZERO);
+    }
 
     public Cake(){}
 
@@ -106,5 +118,13 @@ public class Cake {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public List<CakeSize> getSizes() {
+        return sizes;
+    }
+
+    public void setSizes(List<CakeSize> sizes) {
+        this.sizes = sizes;
     }
 }
