@@ -1,10 +1,26 @@
+/* Add modern font + base font-family */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+
+html, body {
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  /* keep existing background if present elsewhere; overrides applied later */
+  margin: 0; /* remove default browser margin */
+  padding: 0; /* remove default browser padding */
+}
+
+/* Palette
+   primary navy: #083c6f
+   primary-2:    #0b4a6a
+   accent light: #a8d6ff
+*/
+
 .topmenu {
     display: flex;
     justify-content: space-between;
     align-items: center;
     background-color: #00001d;
-    padding: 12px 16px;
-    min-height: 70px;
+    padding: 0 16px; /* removed vertical padding so logo can fill the full menu height */
+    min-height: 86px; /* increased from 80px -> +6px per request */
 }
 
 .topmenu-right {
@@ -30,10 +46,31 @@
     display: inline-block;
 }
 
+/* Make the logo-link a flex container; keep it vertically centered, but limit the logo height so it's not too large */
+.logo-link {
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+/* Set a sensible max height for the logo image so it doesn't fill the entire menu height and becomes too big */
 .topmenu img {
-    height: clamp(48px, 14vw, 60px);
+    height: 86px;       /* increased from 80px -> +6px */
+    max-height: 86px;
     width: auto;
     object-fit: contain;
+    display: block;
+}
+
+/* On very small screens, make the logo a bit smaller to keep the header compact */
+@media (max-width: 480px) {
+    .topmenu img {
+        height: 60px;   /* increased from 54px -> +6px */
+        max-height: 60px;
+    }
+    .topmenu {
+        min-height: 76px; /* increased from 70px -> +6px to match */
+    }
 }
 
 .hamburger-menu {
@@ -71,7 +108,7 @@
     position: absolute;
     top: 100%;
     right: 0;
-    background-color: navy;
+    background: linear-gradient(135deg, #0b4a6a 0%, #083c6f 100%); /* match button gradient */
     padding: 16px 20px;
     min-width: 240px;
     display: none;
@@ -95,10 +132,12 @@
     border-radius: 3px;
 }
 
+/* softer light overlay on hover to keep contrast on gradient */
 .menu-items a:hover {
-    background-color: rgba(240, 248, 255, 0.15);
+    background-color: rgba(168, 214, 255, 0.12);
 }
 
+/* Ensure the fixed/mobile menu inherits the same gradient */
 @media screen and (max-width: 768px) {
     .menu-items {
         position: fixed;
@@ -109,6 +148,7 @@
         max-width: 90vw;
         text-align: center;
         z-index: 999;
+        background: linear-gradient(135deg, #0b4a6a 0%, #083c6f 100%);
     }
 }
 
@@ -337,16 +377,19 @@
 
 .btn-details {
     display: inline-block;
-    background-color: navy;
-    color: aliceblue;
+    background: linear-gradient(135deg, #0b4a6a 0%, #083c6f 100%); /* same as other primary buttons */
+    color: #ffffff; /* bright text on dark gradient */
     padding: 0.7rem 1.5rem;
     text-decoration: none;
-    border-radius: 4px;
-    transition: background-color 0.3s ease;
+    border-radius: 6px;
+    transition: all 0.25s ease;
+    box-shadow: 0 6px 18px rgba(8,60,111,0.14);
+    border: none;
 }
 
 .btn-details:hover {
-    background-color: #00001d;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(8,60,111,0.18);
 }
 
 @media (max-width: 768px) {
@@ -517,8 +560,8 @@
     .modal-content {
         padding: 15px;
         gap: 15px;
-        max-width: none;
-        width: 100%;
+        max-width: 100%;
+        width: calc(100% - 20px);
     }
 
     .modal-images {
@@ -657,24 +700,20 @@
 .custom-btn-order {
     display: inline-block;
     padding: 14px 40px;
-    background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+    background: linear-gradient(135deg, #0b4a6a 0%, #083c6f 100%);
     color: white;
     text-decoration: none;
     border-radius: 8px;
     cursor: pointer;
     font-weight: 600;
     font-size: 16px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+    transition: all 0.25s ease;
+    box-shadow: 0 6px 20px rgba(8, 60, 111, 0.18);
 }
 
 .custom-btn-order:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
-}
-
-.custom-btn-order:active {
-    transform: translateY(0);
+    box-shadow: 0 8px 26px rgba(8, 60, 111, 0.22);
 }
 
 @media (max-width: 992px) {
@@ -699,10 +738,6 @@
 }
 
 @media (max-width: 480px) {
-    .custom-grid {
-        grid-template-columns: 1fr;
-        gap: 0.8rem;
-    }
 
     .custom-image {
         height: 150px;
@@ -717,6 +752,45 @@
         font-size: 0.9rem;
     }
 }
+
+/* =========================
+   UI tweaks requested by user
+   - Light-blue background for whole site
+   - Disable hover and clicks on custom-cakes cards (non-interactive examples)
+   ========================= */
+
+html, body {
+  background: #eaf6ff !important; /* soft light-blue background */
+}
+
+/* Make custom-cakes example cards non-interactive and remove hover effects */
+.custom-section .custom-card,
+.custom-section .custom-card * {
+  pointer-events: none !important;
+  cursor: default !important;
+}
+
+/* Neutralize any hover transforms/shadows for custom cards specifically */
+.custom-section .custom-card:hover,
+.custom-section .custom-card:focus {
+  transform: none !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
+}
+
+/* Ensure images don't get pointer cursor or other hover styles */
+.custom-section .product-image img,
+.custom-section .custom-image img {
+  cursor: default !important;
+  transition: none !important;
+}
+
+/* If any button styles are inherited, keep the order button clickable — only target cards */
+.custom-section .custom-button-container a.custom-btn-order {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+/* end of user-specific tweaks */
 
 /* ============================================
    HANDLEKURV (cart.jsp)
@@ -774,17 +848,16 @@
 }
 
 .remove-btn {
-    background: #ff6b6b;
-    color: white;
-    border: none;
+    background: transparent;
+    color: #083c6f;
+    border: 1px solid rgba(8,60,111,0.12);
     padding: 0.5rem 1rem;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 0.9rem;
 }
 
 .remove-btn:hover {
-    background: #ff5252;
+    background: rgba(11,74,106,0.06);
 }
 
 .cart-summary {
@@ -798,7 +871,7 @@
 .cart-total {
     font-size: 1.5rem;
     font-weight: bold;
-    color: #ff6b6b;
+    color: #083c6f; /* navy */
 }
 
 .cart-actions {
@@ -825,7 +898,7 @@
 }
 
 .btn-checkout {
-    background: #ff6b6b;
+    background: linear-gradient(135deg, #0b4a6a 0%, #083c6f 100%);
     color: white;
     padding: 12px 30px;
     text-decoration: none;
@@ -837,7 +910,7 @@
 }
 
 .btn-checkout:hover {
-    background: #ff5252;
+    background: linear-gradient(135deg, #0f5c8f 0%, #083c6f 100%);
 }
 
 .description-preview {
@@ -908,7 +981,7 @@
 
 .confirmation-box {
     background: #f0f9ff;
-    border: 2px solid #ff6b6b;
+    border: 2px solid rgba(8,60,111,0.12);
     border-radius: 8px;
     padding: 3rem 2rem;
     margin-top: 2rem;
@@ -916,7 +989,7 @@
 
 .confirmation-box h1 {
     font-size: 2.5rem;
-    color: #ff6b6b;
+    color: #083c6f;
     margin-bottom: 1rem;
 }
 
@@ -936,7 +1009,7 @@
 }
 
 .confirmation-highlight strong {
-    color: #ff6b6b;
+    color: #0b4a6a;
     font-size: 1.1rem;
 }
 
@@ -1000,12 +1073,12 @@
 }
 
 .btn-submit {
-    background: #ff6b6b;
+    background: linear-gradient(135deg, #0b4a6a 0%, #083c6f 100%);
     color: white;
 }
 
 .btn-submit:hover {
-    background: #ff5252;
+    background: linear-gradient(135deg, #0f5c8f 0%, #083c6f 100%);
 }
 
 .btn-cancel {
@@ -1043,7 +1116,7 @@
 }
 
 .modal-close:hover {
-    background: #ff6b6b;
+    background: #0b4a6a;
     color: white;
     transform: rotate(90deg);
 }
@@ -1094,7 +1167,7 @@
 .modal-price {
     font-size: 24px;
     font-weight: 700;
-    color: #ff6b6b;
+    color: #0b4a6a;
 }
 
 .allergens {
@@ -1120,18 +1193,18 @@
 }
 
 .allergens li {
-    background: #fff3cd;
+    background: #e6f5ff; /* light blue */
     padding: 8px 12px;
     border-radius: 6px;
     font-size: 12px;
-    color: #856404;
-    border-left: 3px solid #ffc107;
+    color: #083c6f; /* navy */
+    border-left: 3px solid #0b4a6a;
 }
 
 .btn-order {
     display: inline-block;
     padding: 14px 30px;
-    background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+    background: linear-gradient(135deg, #0b4a6a 0%, #083c6f 100%);
     color: white;
     text-decoration: none;
     border-radius: 8px;
@@ -1139,7 +1212,7 @@
     font-weight: 600;
     font-size: 16px;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+    box-shadow: 0 6px 20px rgba(8,60,111,0.18);
     width: 100%;
     text-align: center;
     border: none;
@@ -1148,7 +1221,7 @@
 
 .btn-order:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+    box-shadow: 0 6px 20px rgba(8,60,111,0.22);
 }
 
 .btn-order:active {
@@ -1180,18 +1253,18 @@
 }
 
 .size-option:hover {
-    border-color: #ff6b6b;
-    background: #fff5f5;
+    border-color: #0b4a6a;
+    background: rgba(10,74,106,0.04);
 }
 
 .size-option input[type="radio"] {
     margin-right: 10px;
     cursor: pointer;
-    accent-color: #ff6b6b;
+    accent-color: #0b4a6a; /* modern browsers */
 }
 
 .size-option input[type="radio"]:checked + span {
-    color: #ff6b6b;
+    color: #0b4a6a;
     font-weight: 600;
 }
 
@@ -1305,33 +1378,27 @@
 .custom-btn-order {
     display: inline-block;
     padding: 14px 40px;
-    background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+    background: linear-gradient(135deg, #0b4a6a 0%, #083c6f 100%);
     color: white;
     text-decoration: none;
     border-radius: 8px;
     cursor: pointer;
     font-weight: 600;
     font-size: 16px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
-    border: none;
+    transition: all 0.25s ease;
+    box-shadow: 0 6px 20px rgba(8, 60, 111, 0.18);
 }
 
 .custom-btn-order:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
-}
-
-.custom-btn-order:active {
-    transform: translateY(0);
+    box-shadow: 0 8px 26px rgba(8, 60, 111, 0.22);
 }
 
 .custom-card {
     background: white;
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 2px 8px rgba(8,60,111,0.06);
 }
 
 .custom-card:hover {
@@ -1376,4 +1443,82 @@
     .custom-intro {
         font-size: 0.9rem;
     }
+}
+
+/* Replace legacy pink/red accents */
+
+/* previously: background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%); */
+.custom-btn-order {
+    background: linear-gradient(135deg, #0b4a6a 0%, #083c6f 100%);
+}
+
+/* button hover replacements already exist earlier; ensure specific selectors updated */
+
+/* previously .btn-checkout, .btn-order, etc. updated earlier */
+
+/* Confirmation box border and heading colors already changed earlier; replace any remaining usages */
+
+/* Replace alerts/inline red backgrounds */
+.confirmation-box {
+    border: 2px solid rgba(8,60,111,0.12);
+}
+
+.confirmation-box h1 { color: #083c6f; }
+
+/* Replace .confirmation-box color references */
+
+/* Replace size-option hover (already done) */
+
+/* Replace .btn-order box-shadow earlier set to pink — ensure no pink remains */
+.btn-order, .custom-btn-order {
+    box-shadow: 0 6px 20px rgba(8,60,111,0.18) !important;
+}
+
+/* Allergens badge: change from yellow warning to softer blue variant */
+.allergens li {
+    background: #e6f5ff; /* light blue */
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #083c6f; /* navy */
+    border-left: 3px solid #0b4a6a;
+}
+
+/* Replace any direct hex pink references */
+/* Search results earlier listed lines — we've updated main ones. For safety, neutralize specific pink values if still present */
+:root {
+    --accent-pink-1: #083c6f; /* override any leftover pink usages visually */
+}
+
+/* Replace remaining pink/red gradients and colors with navy equivalents */
+
+/* Replace linear-gradient pink -> navy gradient */
+/* find: background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%); */
+/* replace with navy gradient */
+
+/* Instances replaced below */
+
+/* earlier occurrences were in modal and other buttons; make replacements */
+
+/* If any element still references a pink gradient, override with navy */
+.bg-accent-pink-gradient {
+    background: linear-gradient(135deg, #0b4a6a 0%, #083c6f 100%) !important;
+}
+
+/* Replace single pink solid colors */
+.bg-accent-pink {
+    background: #083c6f !important;
+}
+
+.color-accent-pink {
+    color: #083c6f !important;
+}
+
+.border-accent-pink {
+    border-color: rgba(8,60,111,0.12) !important;
+}
+
+/* Replace any remaining accent-color pink for checkboxes/radios */
+input[type="radio"], input[type="checkbox"] {
+    accent-color: #0b4a6a !important;
 }

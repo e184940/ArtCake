@@ -26,7 +26,7 @@
             <nav class="menu-items">
                 <a href="/products">Vårt faste utvalg</a>
                 <a href="/custom-cakes">Personlige kaker</a>
-                <a href="/about">Om oss / Kontakt</a>
+                <a href="/contact">Kontakt</a>
             </nav>
         </div>
     </div>

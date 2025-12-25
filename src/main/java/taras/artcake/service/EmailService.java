@@ -31,6 +31,46 @@ public class EmailService {
         sendConfirmationEmailToCustomer(customerName, customerEmail, cartItems, cartTotal);
     }
 
+    // Send a simple contact message to the konditor and optionally confirm to the sender
+    public void sendSimpleContactEmail(String senderName, String senderEmail, String body) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(ARTCAKE_EMAIL);
+            message.setFrom("artcake@artcake.no");
+            message.setSubject("Ny kontaktskjema-melding fra " + senderName);
+            StringBuilder sb = new StringBuilder();
+            sb.append("Melding fra kontaktskjema:\n\n");
+            sb.append("Navn: ").append(senderName).append("\n");
+            sb.append("Epost: ").append(senderEmail).append("\n\n");
+            sb.append(body).append("\n\n");
+            sb.append("--\n");
+            sb.append("ArtCake kontaktmelding\n");
+
+            message.setText(sb.toString());
+            mailSender.send(message);
+            logger.info("✉ Kontaktmelding sendt til konditor: {}", ARTCAKE_EMAIL);
+            // Optionally send a simple confirmation to sender
+            try {
+                SimpleMailMessage conf = new SimpleMailMessage();
+                conf.setTo(senderEmail);
+                conf.setFrom("artcake@artcake.no");
+                conf.setSubject("Takk for din melding til ArtCake");
+                conf.setText("Hei " + senderName + "\n\nTakk for meldingen! Vi vil kontakte deg snart.\n\nMed vennlig hilsen,\nArtCake AS");
+                mailSender.send(conf);
+                logger.info("✉ Bekreftelsesmail sendt til avsender: {}", senderEmail);
+            } catch (Exception ex) {
+                logger.warn("✗ Kunne ikke sende bekreftelsesmail til kunde: {}", ex.getMessage());
+            }
+        } catch (Exception e) {
+            logger.warn("✗ Feil ved sending av kontaktmelding: {}", e.getMessage());
+        }
+    }
+
+    // Alias method kept for backward compatibility
+    public void sendContactMessage(String senderName, String senderEmail, String body) {
+        sendSimpleContactEmail(senderName, senderEmail, body);
+    }
+
     private void sendOrderEmailToKonditor(String customerName, String customerEmail, String customerPhone,
                                String deliveryDate, String notes,
                                List<CartService.CartItemDTO> cartItems, BigDecimal cartTotal) {
@@ -165,4 +205,3 @@ public class EmailService {
         return content.toString();
     }
 }
-

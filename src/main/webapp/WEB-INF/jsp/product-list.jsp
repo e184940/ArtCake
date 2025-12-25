@@ -26,14 +26,14 @@
             <nav class="menu-items">
                 <a href="/products">Vårt faste utvalg</a>
                 <a href="/custom-cakes">Personlige kaker</a>
-                <a href="/about">Om oss / Kontakt</a>
+                <a href="/contact">Kontakt</a>
             </nav>
         </div>
     </div>
 </div>
 
 <main class="products-section">
-    <h1>Vårt utvalg av kaker og bakst</h1>
+    <h1>Vårt faste utvalg av kaker!</h1>
 
     <div class="products-grid">
         <c:forEach var="cake" items="${cakes}">

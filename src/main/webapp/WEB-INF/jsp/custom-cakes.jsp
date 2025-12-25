@@ -26,7 +26,7 @@
             <nav class="menu-items">
                 <a href="/products">Vårt faste utvalg</a>
                 <a href="/custom-cakes">Personlige kaker</a>
-                <a href="/about">Om oss / Kontakt</a>
+                <a href="/contact">Kontakt</a>
             </nav>
         </div>
     </div>
@@ -36,32 +36,92 @@
     <h1>Personlige Kaker</h1>
     <p class="custom-intro">
         Vis din kreativitet! Bestill en helt personlig kake som passer dine ønsker og smaksanledninger.
-        Fra bursdager til bryllupper – vi lager den perfekte kaken for deg.
+        Fra bursdager til bryllupper, vi lager den perfekte kaken for deg.
     </p>
 
-    <div class="custom-grid">
-        <div class="custom-card">
-            <div class="custom-image">
-                <img src="https://via.placeholder.com/280x280?text=Bryllupskake" alt="Bryllupskake">
-            </div>
-        </div>
-
-        <div class="custom-card">
-            <div class="custom-image">
-                <img src="https://via.placeholder.com/280x280?text=Bursdagskake" alt="Bursdagskake">
-            </div>
-        </div>
-
-        <div class="custom-card">
-            <div class="custom-image">
-                <img src="https://via.placeholder.com/280x280?text=Tematisk+Kake" alt="Tematisk Kake">
-            </div>
-        </div>
-    </div>
-
-    <div class="custom-button-container">
+    <!-- Center the order button -->
+    <div class="custom-button-container" style="justify-content:center; margin-bottom: 1.5rem;">
         <a href="/order/custom" class="custom-btn-order">Bestill personlig kake</a>
     </div>
+
+    <!-- Use the same responsive grid structure as the product list; cards contain ONLY images (no text) -->
+    <div class="products-grid">
+        <!-- 12 example custom cakes (non-interactive) -->
+
+        <div class="product-card custom-card">
+            <div class="product-image">
+                <img src="/imgs/customs/IMG_0649.jpg" alt="Custom 1">
+            </div>
+        </div>
+
+        <div class="product-card custom-card">
+            <div class="product-image">
+                <img src="/imgs/customs/IMG_1762.jpg" alt="Custom 2">
+            </div>
+        </div>
+
+        <div class="product-card custom-card">
+            <div class="product-image">
+                <img src="/imgs/customs/IMG_2077.jpg" alt="Custom 3">
+            </div>
+        </div>
+
+        <div class="product-card custom-card">
+            <div class="product-image">
+                <img src="/imgs/customs/IMG_2899.jpg" alt="Custom 4">
+            </div>
+        </div>
+
+        <div class="product-card custom-card">
+            <div class="product-image">
+                <img src="/imgs/customs/IMG_3206.jpg" alt="Custom 5">
+            </div>
+        </div>
+
+        <div class="product-card custom-card">
+            <div class="product-image">
+                <img src="/imgs/customs/IMG_3282.JPG" alt="Custom 6">
+            </div>
+        </div>
+
+        <div class="product-card custom-card">
+            <div class="product-image">
+                <img src="/imgs/customs/IMG_3480.jpg" alt="Custom 7">
+            </div>
+        </div>
+
+        <div class="product-card custom-card">
+            <div class="product-image">
+                <img src="/imgs/customs/IMG_3977.jpg" alt="Custom 8">
+            </div>
+        </div>
+
+        <div class="product-card custom-card">
+            <div class="product-image">
+                <img src="/imgs/customs/IMG_5470.jpg" alt="Custom 9">
+            </div>
+        </div>
+
+        <div class="product-card custom-card">
+            <div class="product-image">
+                <img src="/imgs/customs/IMG_6145.jpg" alt="Custom 10">
+            </div>
+        </div>
+
+        <div class="product-card custom-card">
+            <div class="product-image">
+                <img src="/imgs/customs/IMG_7020.jpg" alt="Custom 11">
+            </div>
+        </div>
+
+        <div class="product-card custom-card">
+            <div class="product-image">
+                <img src="/imgs/customs/IMG_9162.jpg" alt="Custom 12">
+            </div>
+        </div>
+
+    </div>
+
 </main>
 
 <script>
@@ -75,4 +135,3 @@
 </script>
 </body>
 </html>
-
