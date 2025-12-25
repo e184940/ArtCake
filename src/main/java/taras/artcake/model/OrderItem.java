@@ -21,6 +21,12 @@ public class OrderItem {
     @Column(name = "cake_size_id")
     private Long cakeSizeId;
 
+    @Column(name = "size_cm")
+    private Integer sizeCm;
+
+    @Column(name = "cake_name")
+    private String cakeName;
+
     private Integer quantity;
     private BigDecimal price;
 
@@ -64,6 +70,22 @@ public class OrderItem {
 
     public void setCakeSizeId(Long cakeSizeId) {
         this.cakeSizeId = cakeSizeId;
+    }
+
+    public Integer getSizeCm() {
+        return sizeCm;
+    }
+
+    public void setSizeCm(Integer sizeCm) {
+        this.sizeCm = sizeCm;
+    }
+
+    public String getCakeName() {
+        return cakeName;
+    }
+
+    public void setCakeName(String cakeName) {
+        this.cakeName = cakeName;
     }
 
     public Integer getQuantity() {

@@ -1,5 +1,7 @@
 package taras.artcake.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,6 +20,8 @@ import java.util.List;
 @Controller
 @RequestMapping("/cart")
 public class CartController {
+
+    private static final Logger logger = LoggerFactory.getLogger(CartController.class);
 
     @Autowired
     private CartService cartService;
@@ -102,59 +106,78 @@ public class CartController {
             Model model,
             HttpSession session) {
 
-        var cartItems = cartService.getCartItems(session);
-        var cartTotal = cartService.getCartTotal(session);
+        try {
+            logger.info("=== CHECKOUT START ===");
+            logger.info("Kunde: " + customerName + " (" + customerEmail + ")");
 
-        if (cartItems.isEmpty()) {
-            model.addAttribute("error", "Handlekurven er tom");
-            return "redirect:/cart";
-        }
+            var cartItems = cartService.getCartItems(session);
+            var cartTotal = cartService.getCartTotal(session);
 
-        // Lagre bestilling i databasen
-        Order order = new Order();
-        order.setCustomerName(customerName);
-        order.setCustomerEmail(customerEmail);
-        order.setCustomerPhone(customerPhone);
-        order.setDeliveryDate(deliveryDate);
-        order.setNotes(notes);
-        order.setTotalPrice(cartTotal);
-        order.setStatus("Ny");
-        order.setOrderDate(LocalDateTime.now());
+            logger.info("Handlekurv items: " + cartItems.size());
 
-        // Lagre order først
-        Order savedOrder = orderRepository.save(order);
-
-        // Lagre order items
-        List<OrderItem> orderItems = new ArrayList<>();
-        for (CartService.CartItemDTO cartItem : cartItems) {
-            OrderItem orderItem = new OrderItem();
-            orderItem.setOrder(savedOrder);
-            orderItem.setCakeName(cartItem.getCakeName());
-            orderItem.setItemType(cartItem.getItemType());
-            orderItem.setQuantity(cartItem.getQuantity());
-            orderItem.setPrice(cartItem.getPrice());
-
-            if ("standard".equals(cartItem.getItemType())) {
-                orderItem.setCakeSizeId(cartItem.getCakeSizeId());
-                orderItem.setSizeCm(cartItem.getSizeCm());
-            } else if ("custom".equals(cartItem.getItemType())) {
-                orderItem.setCustomDescription(cartItem.getCustomDescription());
-                orderItem.setCustomImageUrl(cartItem.getCustomImageUrl());
+            if (cartItems.isEmpty()) {
+                logger.warn("Handlekurven er tom!");
+                model.addAttribute("error", "Handlekurven er tom");
+                return "redirect:/cart";
             }
 
-            orderItems.add(orderItem);
+            // Lagre bestilling i databasen
+            logger.info("Lagrer bestilling i database...");
+            Order order = new Order();
+            order.setCustomerName(customerName);
+            order.setCustomerEmail(customerEmail);
+            order.setCustomerPhone(customerPhone);
+            order.setDeliveryDate(deliveryDate);
+            order.setNotes(notes);
+            order.setTotalPrice(cartTotal);
+            order.setStatus("Ny");
+            order.setOrderDate(LocalDateTime.now());
+
+            // Lagre order først
+            Order savedOrder = orderRepository.save(order);
+            logger.info("✓ Bestilling lagret med ID: " + savedOrder.getId());
+
+            // Lagre order items
+            List<OrderItem> orderItems = new ArrayList<>();
+            for (CartService.CartItemDTO cartItem : cartItems) {
+                OrderItem orderItem = new OrderItem();
+                orderItem.setOrder(savedOrder);
+                orderItem.setCakeName(cartItem.getCakeName());
+                orderItem.setItemType(cartItem.getItemType());
+                orderItem.setQuantity(cartItem.getQuantity());
+                orderItem.setPrice(cartItem.getPrice());
+
+                if ("standard".equals(cartItem.getItemType())) {
+                    orderItem.setCakeSizeId(cartItem.getCakeSizeId());
+                    orderItem.setSizeCm(cartItem.getSizeCm());
+                } else if ("custom".equals(cartItem.getItemType())) {
+                    orderItem.setCustomDescription(cartItem.getCustomDescription());
+                    orderItem.setCustomImageUrl(cartItem.getCustomImageUrl());
+                }
+
+                orderItems.add(orderItem);
+            }
+            savedOrder.setItems(orderItems);
+            orderRepository.save(savedOrder);
+            logger.info("✓ Order items lagret: " + orderItems.size());
+
+            // Send email til konditor og kunde
+            logger.info("Sender eposter...");
+            emailService.sendOrderEmail(customerName, customerEmail, customerPhone,
+                                       deliveryDate, notes, cartItems, cartTotal);
+
+            // Tøm handlekurven
+            cartService.clearCart(session);
+            logger.info("✓ Handlekurven tømt");
+
+            logger.info("=== CHECKOUT FULLFØRT ===");
+            return "order-confirmation";
+
+        } catch (Exception e) {
+            logger.error("✗ FEIL I CHECKOUT: " + e.getMessage(), e);
+            model.addAttribute("error", "Feil ved behandling av bestilling: " + e.getMessage());
+            return "redirect:/cart";
         }
-        savedOrder.setItems(orderItems);
-        orderRepository.save(savedOrder);
-
-        // Send email til konditor
-        emailService.sendOrderEmail(customerName, customerEmail, customerPhone,
-                                   deliveryDate, notes, cartItems, cartTotal);
-
-        // Tøm handlekurven
-        cartService.clearCart(session);
-
-        return "order-confirmation";
     }
 }
 

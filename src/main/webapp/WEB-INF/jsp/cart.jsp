@@ -11,11 +11,11 @@
 <body>
 <div class="topmenu">
     <a href="/" class="logo-link">
-        <img src="/imgs/logo-no-bg.png" alt="ArtCake AS">
+        <img src="/imgs/logo_hvit_nobg.png" alt="ArtCake AS">
     </a>
     <div class="topmenu-right">
         <a href="/cart" class="cart-link" title="Handlekurv">
-            <span class="cart-icon">🛒</span>
+            <span class="cart-icon">[CART]</span>
         </a>
         <div class="hamburger-menu">
             <div class="hamburger">
@@ -33,7 +33,7 @@
 </div>
 
 <main class="cart-section">
-    <h1>🛒 Handlekurv</h1>
+    <h1>Handlekurv</h1>
 
     <c:if test="${empty cartItems}">
         <div class="cart-empty">
@@ -145,17 +145,22 @@
 
     // Set minimum delivery date to 3 days from today
     const deliveryDateInput = document.getElementById('deliveryDate');
-    const today = new Date();
-    const minDate = new Date(today);
-    minDate.setDate(minDate.getDate() + 3);
+    if (deliveryDateInput) {
+        const today = new Date();
+        const minDate = new Date(today);
+        minDate.setDate(minDate.getDate() + 3);
 
-    const dateString = minDate.toISOString().split('T')[0];
-    deliveryDateInput.setAttribute('min', dateString);
+        const dateString = minDate.toISOString().split('T')[0];
+        deliveryDateInput.setAttribute('min', dateString);
+    }
 
-    document.querySelector(".hamburger").addEventListener("click", function(){
-        this.classList.toggle("active");
-        document.querySelector(".menu-items").classList.toggle("active");
-    });
+    const hamburger = document.querySelector(".hamburger");
+    if (hamburger) {
+        hamburger.addEventListener("click", function(){
+            this.classList.toggle("active");
+            document.querySelector(".menu-items").classList.toggle("active");
+        });
+    }
 </script>
 </body>
 </html>

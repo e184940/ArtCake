@@ -10,11 +10,11 @@
 <body>
 <div class="topmenu">
     <a href="/" class="logo-link">
-        <img src="/imgs/logo-no-bg.png" alt="ArtCake AS">
+        <img src="/imgs/logo_hvit_nobg.png" alt="ArtCake AS">
     </a>
     <div class="topmenu-right">
         <a href="/cart" class="cart-link" title="Handlekurv">
-            <span class="cart-icon">🛒</span>
+            <span class="cart-icon">[CART]</span>
         </a>
         <div class="hamburger-menu">
             <div class="hamburger">
@@ -50,10 +50,13 @@
 </main>
 
 <script>
-    document.querySelector(".hamburger").addEventListener("click", function(){
-        this.classList.toggle("active");
-        document.querySelector(".menu-items").classList.toggle("active");
-    });
+    const hamburger = document.querySelector(".hamburger");
+    if (hamburger) {
+        hamburger.addEventListener("click", function(){
+            this.classList.toggle("active");
+            document.querySelector(".menu-items").classList.toggle("active");
+        });
+    }
 </script>
 </body>
 </html>

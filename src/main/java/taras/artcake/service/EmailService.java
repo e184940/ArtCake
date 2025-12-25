@@ -1,5 +1,7 @@
 package taras.artcake.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -9,6 +11,8 @@ import java.util.List;
 
 @Service
 public class EmailService {
+
+    private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
 
     @Autowired
     private JavaMailSender mailSender;
@@ -21,7 +25,7 @@ public class EmailService {
 
         // Send email to konditor (ArtCake)
         sendOrderEmailToKonditor(customerName, customerEmail, customerPhone,
-                                 deliveryDate, notes, cartItems, cartTotal);
+                deliveryDate, notes, cartItems, cartTotal);
 
         // Send confirmation email to customer
         sendConfirmationEmailToCustomer(customerName, customerEmail, cartItems, cartTotal);
@@ -31,17 +35,19 @@ public class EmailService {
                                String deliveryDate, String notes,
                                List<CartService.CartItemDTO> cartItems, BigDecimal cartTotal) {
 
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(ARTCAKE_EMAIL);
-        message.setFrom("artcake@artcake.no");
-        message.setSubject("📦 Ny bestilling fra " + customerName);
-        message.setText(buildOrderEmailContent(customerName, customerEmail, customerPhone,
-                                               deliveryDate, notes, cartItems, cartTotal));
-
         try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(ARTCAKE_EMAIL);
+            message.setFrom("artcake@artcake.no");
+            message.setSubject("📦 Ny bestilling fra " + customerName);
+            message.setText(buildOrderEmailContent(customerName, customerEmail, customerPhone,
+                                                   deliveryDate, notes, cartItems, cartTotal));
+
+            logger.info("Sender bestillingsepost til konditor: " + ARTCAKE_EMAIL);
             mailSender.send(message);
+            logger.info("✓ Bestillingsepost sendt til konditor");
         } catch (Exception e) {
-            System.err.println("Feil ved sending av epost til konditor: " + e.getMessage());
+            logger.warn("⚠ Email-sending feilet (bestillingen er likevel lagret): " + e.getMessage());
         }
     }
 
@@ -49,23 +55,25 @@ public class EmailService {
                                                  List<CartService.CartItemDTO> cartItems,
                                                  BigDecimal cartTotal) {
 
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(customerEmail);
-        message.setFrom("artcake@artcake.no");
-        message.setSubject("✓ Bestillingen din er mottatt - ArtCake AS");
-        message.setText(buildConfirmationEmailContent(customerName, cartItems, cartTotal));
-
         try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(customerEmail);
+            message.setFrom("artcake@artcake.no");
+            message.setSubject("✓ Bestillingen din er mottatt - ArtCake AS");
+            message.setText(buildConfirmationEmailContent(customerName, cartItems, cartTotal));
+
+            logger.info("Sender bekreftelsesmail til kunde: " + customerEmail);
             mailSender.send(message);
+            logger.info("✓ Bekreftelsesmail sendt til kunde");
         } catch (Exception e) {
-            System.err.println("Feil ved sending av bekreftelsesepost til kunde: " + e.getMessage());
+            logger.warn("⚠ Email-sending feilet (bestillingen er likevel lagret): " + e.getMessage());
         }
     }
 
     private String buildOrderEmailContent(String customerName, String customerEmail,
-                                         String customerPhone, String deliveryDate,
-                                         String notes, List<CartService.CartItemDTO> cartItems,
-                                         BigDecimal cartTotal) {
+                                          String customerPhone, String deliveryDate,
+                                          String notes, List<CartService.CartItemDTO> cartItems,
+                                          BigDecimal cartTotal) {
 
         StringBuilder content = new StringBuilder();
         content.append("═══════════════════════════════════════\n");
@@ -88,7 +96,7 @@ public class EmailService {
 
             if ("standard".equals(item.getItemType())) {
                 content.append(item.getCakeName()).append(" (").append(item.getSizeCm())
-                       .append(" cm)\n");
+                        .append(" cm)\n");
                 content.append("   Pris: ").append(item.getPrice()).append(" kr\n\n");
             } else if ("custom".equals(item.getItemType())) {
                 content.append("PERSONLIG KAKE\n");
@@ -120,7 +128,7 @@ public class EmailService {
                                                  BigDecimal cartTotal) {
 
         StringBuilder content = new StringBuilder();
-        content.append("Hei ").append(customerName).append("! 🎉\n\n");
+        content.append("Hei ").append(customerName).append("!\n\n");
 
         content.append("Takk for din bestilling hos ArtCake AS!\n\n");
 
@@ -147,7 +155,7 @@ public class EmailService {
 
         content.append("En av våre kakemestere vil kontakte deg snart for å bekrefte detaljer og gi deg en endelig pris.\n\n");
 
-        content.append("Takk for at du velger ArtCake! 🎂\n\n");
+        content.append("Takk for at du velger ArtCake!\n\n");
 
         content.append("Med vennlig hilsen,\n");
         content.append("ArtCake AS\n");
@@ -156,4 +164,5 @@ public class EmailService {
 
         return content.toString();
     }
+}
 
