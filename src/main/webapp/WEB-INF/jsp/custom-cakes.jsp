@@ -6,7 +6,7 @@
     <link href="/css/style.css" rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vårt utvalg - ArtCake AS</title>
+    <title>Personlige kaker - ArtCake AS</title>
 </head>
 <body>
 <div class="topmenu">
@@ -32,23 +32,35 @@
     </div>
 </div>
 
-<main class="products-section">
-    <h1>Vårt utvalg av kaker og bakst</h1>
+<main class="custom-section">
+    <h1>Personlige Kaker</h1>
+    <p class="custom-intro">
+        Vis din kreativitet! Bestill en helt personlig kake som passer dine ønsker og smaksanledninger.
+        Fra bursdager til bryllupper – vi lager den perfekte kaken for deg.
+    </p>
 
-    <div class="products-grid">
-        <c:forEach var="cake" items="${cakes}">
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="${cake.imageUrl}" alt="${cake.name}">
-                </div>
-                <div class="product-info">
-                    <h2>${cake.name}</h2>
-                    <p class="product-description">${cake.description}</p>
-                    <p class="product-price">Fra: ${cake.minPrice} kr</p>
-                    <a href="/products/${cake.id}" class="btn-details">Se detaljer</a>
-                </div>
+    <div class="custom-grid">
+        <div class="custom-card">
+            <div class="custom-image">
+                <img src="https://via.placeholder.com/280x280?text=Bryllupskake" alt="Bryllupskake">
             </div>
-        </c:forEach>
+        </div>
+
+        <div class="custom-card">
+            <div class="custom-image">
+                <img src="https://via.placeholder.com/280x280?text=Bursdagskake" alt="Bursdagskake">
+            </div>
+        </div>
+
+        <div class="custom-card">
+            <div class="custom-image">
+                <img src="https://via.placeholder.com/280x280?text=Tematisk+Kake" alt="Tematisk Kake">
+            </div>
+        </div>
+    </div>
+
+    <div class="custom-button-container">
+        <a href="/order/custom" class="custom-btn-order">Bestill personlig kake</a>
     </div>
 </main>
 
@@ -60,3 +72,4 @@
 </script>
 </body>
 </html>
+

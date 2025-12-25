@@ -13,13 +13,33 @@
     <a href="/" class="logo-link">
         <img src="/imgs/logo-no-bg.png" alt="ArtCake AS">
     </a>
+    <div class="topmenu-right">
+        <a href="/cart" class="cart-link" title="Handlekurv">
+            <span class="cart-icon">🛒</span>
+        </a>
+        <div class="hamburger-menu">
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <nav class="menu-items">
+                <a href="/products">Vårt faste utvalg</a>
+                <a href="/custom-cakes">Personlige kaker</a>
+                <a href="/about">Om oss / Kontakt</a>
+            </nav>
+        </div>
+    </div>
 </div>
 
 <div class="modal-overlay" id="detailsModal">
     <div class="modal-content">
         <button class="modal-close" onclick="window.history.back()">&times;</button>
         <div class="modal-body">
-            <img src="${cake.imageUrl}" alt="${cake.name}" class="modal-image">
+            <div class="modal-images">
+                <img src="${cake.imageUrl}" alt="${cake.name}" class="modal-image">
+                <img src="${cake.imageUrl2}" alt="${cake.name}" class="modal-image">
+            </div>
 
             <div class="modal-info-section">
                 <h2>${cake.name}</h2>
@@ -50,7 +70,7 @@
                     </ul>
                 </div>
 
-                <button class="btn-order" onclick="goToOrder()">Gå til bestilling</button>
+                <button class="btn-order" onclick="addToCart()">Legg i handlekurv</button>
             </div>
         </div>
     </div>
@@ -65,13 +85,27 @@
         }
     });
 
-    function goToOrder() {
+    function addToCart() {
         const selectedSize = document.querySelector('input[name="selectedSize"]:checked');
         if (!selectedSize) {
             alert('Vennligst velg en størrelse');
             return;
         }
-        window.location.href = '/order/${cake.id}?sizeId=' + selectedSize.value;
+
+        const cakeSizeId = selectedSize.value;
+        const price = selectedSize.getAttribute('data-price');
+        const sizeCm = selectedSize.nextElementSibling.textContent.split(' ')[0];
+
+        fetch('/cart/add-standard', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'cakeId=${cake.id}&cakeName=${cake.name}&cakeSizeId=' + cakeSizeId + '&sizeCm=' + sizeCm + '&price=' + price
+        }).then(() => {
+            alert('Lagt til handlekurv!');
+            window.location.href = '/cart';
+        });
     }
 </script>
 </body>

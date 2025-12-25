@@ -23,12 +23,13 @@ public class Cake {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    private float price;
-
     @Column(name = "image_url")
     private String imageUrl;
 
-    @ManyToMany
+    @Column(name = "image_url_2")
+    private String imageUrl2;
+
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "cake_allergens",
             joinColumns = @JoinColumn(name = "cake_id"),
@@ -44,17 +45,21 @@ public class Cake {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "cake", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "cake", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<CakeSize> sizes;
 
     public BigDecimal getMinPrice() {
+        if (sizes == null || sizes.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
         return sizes.stream()
                 .map(CakeSize::getPrice)
                 .min(BigDecimal::compareTo)
                 .orElse(BigDecimal.ZERO);
     }
 
-    public Cake(){}
+    public Cake() {
+    }
 
     public Long getId() {
         return id;
@@ -78,14 +83,6 @@ public class Cake {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public float getPrice() {
-        return price;
-    }
-
-    public void setPrice(float price) {
-        this.price = price;
     }
 
     public String getImageUrl() {
@@ -126,5 +123,13 @@ public class Cake {
 
     public void setSizes(List<CakeSize> sizes) {
         this.sizes = sizes;
+    }
+
+    public String getImageUrl2() {
+        return imageUrl2;
+    }
+
+    public void setImageUrl2(String imageUrl2) {
+        this.imageUrl2 = imageUrl2;
     }
 }
