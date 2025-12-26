@@ -10,7 +10,7 @@
 <body>
 <div class="topmenu">
     <a href="/" class="logo-link">
-        <img src="/imgs/logo_hvit_nobg.png" alt="ArtCake AS">
+        <img src="/images/logo_hvit_nobg.png" alt="ArtCake AS">
     </a>
     <div class="topmenu-right">
         <a href="/cart" class="cart-link" title="Handlekurv">
@@ -43,7 +43,7 @@
         <p>Alt vi gjør, gjør vi med formål om å lage de <strong>deiligste kakene</strong> du noensinne har smakt!</p>
         <p>Vi lager alt fra store saftige honningkaker, til små deilige sjokoloadekaker.</p>
         <p>Fine kaker med personlige meldinger eller pynt ordner vi selvsagt også!</p>
-        <img src="/imgs/logo-no-bg.png">
+        <img src="/images/logo-no-bg.png">
     </div>
 </main>
 

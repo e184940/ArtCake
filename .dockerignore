@@ -24,7 +24,7 @@ target/
 Thumbs.db
 
 # Uploaded files
-src/main/resources/static/imgs/custom-uploads/
+src/main/resources/static/images/custom-uploads/
 
 # Temporary files
 *.tmp

@@ -211,7 +211,7 @@ html, body {
 }
 
 .hero {
-    background: url('../imgs/bringeber.jpg') center;
+    background: url('../images/bringeber.jpg') center;
     background-size: cover;
     background-attachment: fixed;
     height: 50vh;

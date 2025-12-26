@@ -110,14 +110,14 @@ public class CartController {
                     }
 
                     // Use target directory for uploads during development
-                    Path uploadPath = Paths.get("target/classes/static/imgs/custom-uploads/");
+                    Path uploadPath = Paths.get("target/classes/static/images/custom-uploads/");
                     if (!Files.exists(uploadPath)) {
                         Files.createDirectories(uploadPath);
                         logger.info("Created upload directory: {}", uploadPath.toAbsolutePath());
                     }
 
                     // Also create in src for persistence across rebuilds
-                    Path srcUploadPath = Paths.get("src/main/resources/static/imgs/custom-uploads/");
+                    Path srcUploadPath = Paths.get("src/main/resources/static/images/custom-uploads/");
                     if (!Files.exists(srcUploadPath)) {
                         Files.createDirectories(srcUploadPath);
                         logger.info("Created src upload directory: {}", srcUploadPath.toAbsolutePath());
@@ -144,7 +144,7 @@ public class CartController {
                     Files.copy(targetFilePath, srcFilePath, StandardCopyOption.REPLACE_EXISTING);
                     logger.info("Copied file to src: {}", srcFilePath.toAbsolutePath());
 
-                    finalImageUrl = "/imgs/custom-uploads/" + fileName;
+                    finalImageUrl = "/images/custom-uploads/" + fileName;
                     logger.info("Custom cake inspiration image uploaded successfully: {}", finalImageUrl);
 
                 } catch (Exception e) {

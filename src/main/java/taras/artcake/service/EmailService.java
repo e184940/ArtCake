@@ -127,14 +127,14 @@ public class EmailService {
                         !item.getCustomImageUrl().trim().isEmpty()) {
 
                         String imageUrl = item.getCustomImageUrl();
-                        if (imageUrl.startsWith("/imgs/custom-uploads/")) {
+                        if (imageUrl.startsWith("/images/custom-uploads/")) {
                             // Find the actual file
-                            String filename = imageUrl.substring("/imgs/custom-uploads/".length());
-                            Path imagePath = Paths.get("src/main/resources/static/imgs/custom-uploads/" + filename);
+                            String filename = imageUrl.substring("/images/custom-uploads/".length());
+                            Path imagePath = Paths.get("src/main/resources/static/images/custom-uploads/" + filename);
 
                             if (!Files.exists(imagePath)) {
                                 // Try target directory
-                                imagePath = Paths.get("target/classes/static/imgs/custom-uploads/" + filename);
+                                imagePath = Paths.get("target/classes/static/images/custom-uploads/" + filename);
                             }
 
                             if (Files.exists(imagePath)) {
@@ -198,14 +198,14 @@ public class EmailService {
                         !item.getCustomImageUrl().trim().isEmpty()) {
 
                         String imageUrl = item.getCustomImageUrl();
-                        if (imageUrl.startsWith("/imgs/custom-uploads/")) {
+                        if (imageUrl.startsWith("/images/custom-uploads/")) {
                             // Find the actual file
-                            String filename = imageUrl.substring("/imgs/custom-uploads/".length());
-                            Path imagePath = Paths.get("src/main/resources/static/imgs/custom-uploads/" + filename);
+                            String filename = imageUrl.substring("/images/custom-uploads/".length());
+                            Path imagePath = Paths.get("src/main/resources/static/images/custom-uploads/" + filename);
 
                             if (!Files.exists(imagePath)) {
                                 // Try target directory
-                                imagePath = Paths.get("target/classes/static/imgs/custom-uploads/" + filename);
+                                imagePath = Paths.get("target/classes/static/images/custom-uploads/" + filename);
                             }
 
                             if (Files.exists(imagePath)) {

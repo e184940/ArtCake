@@ -20,7 +20,7 @@ target/
 Thumbs.db
 
 # Uploaded files (custom cake inspiration images)
-src/main/resources/static/imgs/custom-uploads/
+src/main/resources/static/images/custom-uploads/
 
 # Temporary files
 *.tmp
