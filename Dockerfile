@@ -1,4 +1,4 @@
-FROM eclipse-temurin:21-jdk-alpine
+FROM eclipse-temurin:17-jdk-alpine
 
 WORKDIR /app
 
@@ -23,4 +23,4 @@ RUN ./mvnw clean package -DskipTests
 EXPOSE 8080
 
 # Run application
-CMD ["java", "-Dserver.port=${PORT:-8080}", "-Xmx400m", "-jar", "target/ArtCake-0.0.1-SNAPSHOT.jar"]
+CMD ["java", "-Dserver.port=${PORT:-8080}", "-Xmx400m", "-jar", "target/artcake.jar"]
