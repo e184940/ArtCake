@@ -11,7 +11,7 @@
 <body>
 <div class="topmenu">
     <a href="/" class="logo-link">
-        <img src="/images/logo_hvit_nobg.png" alt="ArtCake AS">
+        <img src="<c:url value='/images/logo_hvit_nobg.png'/>" alt="ArtCake AS">
     </a>
     <div class="topmenu-right">
         <a href="/cart" class="cart-link" title="Handlekurv">
@@ -39,7 +39,7 @@
         <c:forEach var="cake" items="${cakes}">
             <div class="product-card">
                 <div class="product-image">
-                    <img src="${cake.imageUrl}" alt="${cake.name}">
+                    <img src="<c:url value='${cake.imageUrl}'/>" alt="${cake.name}">
                 </div>
                 <div class="product-info">
                     <h2>${cake.name}</h2>
