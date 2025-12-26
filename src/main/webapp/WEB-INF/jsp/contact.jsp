@@ -31,47 +31,50 @@
     </div>
 </div>
 
-<main class="contact-section" style="padding:2rem; max-width:900px; margin:0 auto;">
-    <h1>Kontakt oss</h1>
+<main class="contact-section">
+    <div class="contact-inner">
+        <h1>Kontakt oss</h1>
 
-    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items:start;">
-        <div>
-            <h3>Adresse</h3>
-            <p>Art Cake Studio AS<br>Matti Aikios vei 8<br>8019, Bodø</p>
+        <div class="contact-grid">
+            <div>
+                <h3>Adresse</h3>
+                <p>Art Cake Studio AS<br>Matti Aikios vei 8<br>8019, Bodø</p>
+                <br>
 
-            <h3>Kontakt</h3>
-            <p>Epost: <a href="mailto:artcake@artcake.no">artcake@artcake.no</a><br>
-               Telefon: <a href="tel:+4712345678">+47 12 34 56 78</a></p>
+                <h3>Kontakt</h3>
+                <p>Epost: <a href="mailto:artcake@artcake.no">artcake@artcake.no</a><br>
+                   Telefon: <a href="tel:+4791794812">+47 917 94 812</a></p>
+                <br>
 
-            <h3>Følg oss</h3>
-            <p>
-                <a href="https://www.facebook.com/artcake" target="_blank">Facebook</a><br>
-                <a href="https://www.instagram.com/artcake" target="_blank">Instagram</a>
-            </p>
-        </div>
+                <h3>Følg oss</h3>
+                <p>
+                    <a href="https://www.facebook.com/artcake" target="_blank">Facebook</a><br>
+                    <a href="https://www.instagram.com/artcake" target="_blank">Instagram</a>
+                </p>
+            </div>
 
-        <div>
-            <h3>Send en melding</h3>
-            <form method="POST" action="/contact/send">
-                <div class="form-group">
-                    <label for="name">Navn</label>
-                    <input type="text" id="name" name="name" required>
-                </div>
-                <div class="form-group">
-                    <label for="email">Epost</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="message">Melding</label>
-                    <textarea id="message" name="message" rows="6" required></textarea>
-                </div>
-                <div style="margin-top: 1rem;">
-                    <button type="submit" class="btn-submit">Send melding</button>
-                </div>
-            </form>
+            <div>
+                <h3>Send en melding</h3>
+                <form method="POST" action="/contact/send">
+                    <div class="form-group">
+                        <label for="name">Navn</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Epost</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Melding</label>
+                        <textarea id="message" name="message" rows="6" required></textarea>
+                    </div>
+                    <div style="margin-top: 1rem;">
+                        <button type="submit" class="btn-submit">Send melding</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-
 </main>
 
 <script>
@@ -85,4 +88,3 @@
 </script>
 </body>
 </html>
-

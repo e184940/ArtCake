@@ -3,6 +3,7 @@ package taras.artcake.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,9 @@ public class EmailService {
     private JavaMailSender mailSender;
 
     private static final String ARTCAKE_EMAIL = "artcake@artcake.no";
+
+    @Value("${app.mail.from:artcake@artcake.no}")
+    private String mailFrom;
 
     public void sendOrderEmail(String customerName, String customerEmail, String customerPhone,
                                String deliveryDate, String notes,
@@ -36,7 +40,7 @@ public class EmailService {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo(ARTCAKE_EMAIL);
-            message.setFrom("artcake@artcake.no");
+            message.setFrom(mailFrom);
             message.setSubject("Ny kontaktskjema-melding fra " + senderName);
             StringBuilder sb = new StringBuilder();
             sb.append("Melding fra kontaktskjema:\n\n");
@@ -48,21 +52,21 @@ public class EmailService {
 
             message.setText(sb.toString());
             mailSender.send(message);
-            logger.info("✉ Kontaktmelding sendt til konditor: {}", ARTCAKE_EMAIL);
+            logger.info("Kontaktmelding sendt til konditor: {}", ARTCAKE_EMAIL);
             // Optionally send a simple confirmation to sender
             try {
                 SimpleMailMessage conf = new SimpleMailMessage();
                 conf.setTo(senderEmail);
-                conf.setFrom("artcake@artcake.no");
+                conf.setFrom(mailFrom);
                 conf.setSubject("Takk for din melding til ArtCake");
                 conf.setText("Hei " + senderName + "\n\nTakk for meldingen! Vi vil kontakte deg snart.\n\nMed vennlig hilsen,\nArtCake AS");
                 mailSender.send(conf);
-                logger.info("✉ Bekreftelsesmail sendt til avsender: {}", senderEmail);
+                logger.info("Bekreftelsesmail sendt til avsender: {}", senderEmail);
             } catch (Exception ex) {
-                logger.warn("✗ Kunne ikke sende bekreftelsesmail til kunde: {}", ex.getMessage());
+                logger.warn("Kunne ikke sende bekreftelsesmail til kunde: {}", ex.getMessage());
             }
         } catch (Exception e) {
-            logger.warn("✗ Feil ved sending av kontaktmelding: {}", e.getMessage());
+            logger.warn("Feil ved sending av kontaktmelding: {}", e.getMessage());
         }
     }
 
@@ -78,16 +82,16 @@ public class EmailService {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo(ARTCAKE_EMAIL);
-            message.setFrom("artcake@artcake.no");
-            message.setSubject("📦 Ny bestilling fra " + customerName);
+            message.setFrom(mailFrom);
+            message.setSubject("Ny bestilling fra " + customerName);
             message.setText(buildOrderEmailContent(customerName, customerEmail, customerPhone,
                                                    deliveryDate, notes, cartItems, cartTotal));
 
             logger.info("Sender bestillingsepost til konditor: " + ARTCAKE_EMAIL);
             mailSender.send(message);
-            logger.info("✓ Bestillingsepost sendt til konditor");
+            logger.info("Bestillingsepost sendt til konditor");
         } catch (Exception e) {
-            logger.warn("⚠ Email-sending feilet (bestillingen er likevel lagret): " + e.getMessage());
+            logger.warn("Email-sending feilet (bestillingen er likevel lagret): " + e.getMessage());
         }
     }
 
@@ -98,15 +102,15 @@ public class EmailService {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo(customerEmail);
-            message.setFrom("artcake@artcake.no");
-            message.setSubject("✓ Bestillingen din er mottatt - ArtCake AS");
+            message.setFrom(mailFrom);
+            message.setSubject("Bestillingen din er mottatt - ArtCake AS");
             message.setText(buildConfirmationEmailContent(customerName, cartItems, cartTotal));
 
             logger.info("Sender bekreftelsesmail til kunde: " + customerEmail);
             mailSender.send(message);
-            logger.info("✓ Bekreftelsesmail sendt til kunde");
+            logger.info("Bekreftelsesmail sendt til kunde");
         } catch (Exception e) {
-            logger.warn("⚠ Email-sending feilet (bestillingen er likevel lagret): " + e.getMessage());
+            logger.warn("Email-sending feilet (bestillingen er likevel lagret): " + e.getMessage());
         }
     }
 
@@ -117,7 +121,7 @@ public class EmailService {
 
         StringBuilder content = new StringBuilder();
         content.append("═══════════════════════════════════════\n");
-        content.append("NY BESTILLING - ARTCAKE\n");
+        content.append("NY BESTILLING!\n");
         content.append("═══════════════════════════════════════\n\n");
 
         content.append("KUNDEINFO:\n");
@@ -141,6 +145,19 @@ public class EmailService {
             } else if ("custom".equals(item.getItemType())) {
                 content.append("PERSONLIG KAKE\n");
                 content.append("   Beskrivelse: ").append(item.getCustomDescription()).append("\n");
+
+                // Add inspiration image if present
+                String imageUrl = item.getCustomImageUrl();
+                if (imageUrl != null && !imageUrl.trim().isEmpty()) {
+                    // Convert relative path to absolute URL
+                    if (imageUrl.startsWith("/")) {
+                        imageUrl = appBaseUrl.replaceAll("/+$", "") + imageUrl;
+                    }
+                    content.append("   Inspirasjonsbilde: ").append(imageUrl).append("\n");
+                } else {
+                    content.append("   Inspirasjonsbilde: Ingen bilde vedlagt\n");
+                }
+
                 content.append("   Estimert pris: ").append(item.getPrice()).append(" kr\n\n");
             }
             itemNumber++;
@@ -185,6 +202,19 @@ public class EmailService {
             } else if ("custom".equals(item.getItemType())) {
                 content.append("Personlig kake\n");
                 content.append("   ").append(item.getCustomDescription()).append("\n");
+
+                // Add inspiration image if present
+                String imageUrl = item.getCustomImageUrl();
+                if (imageUrl != null && !imageUrl.trim().isEmpty()) {
+                    // Convert relative path to absolute URL
+                    if (imageUrl.startsWith("/")) {
+                        imageUrl = appBaseUrl.replaceAll("/+$", "") + imageUrl;
+                    }
+                    content.append("   Inspirasjonsbilde: ").append(imageUrl).append("\n");
+                } else {
+                    content.append("   Inspirasjonsbilde: Ingen bilde vedlagt\n");
+                }
+
                 content.append("   Estimert pris: ").append(item.getPrice()).append(" kr\n\n");
             }
             itemNumber++;
@@ -205,3 +235,5 @@ public class EmailService {
         return content.toString();
     }
 }
+
+
