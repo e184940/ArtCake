@@ -10,8 +10,8 @@
 </head>
 <body>
 <div class="topmenu">
-    <a href="/" class="logo-link">
-        <img src="/images/logo_hvit_nobg.png" alt="ArtCake AS">
+    <a href="<c:url value='/'/>" class="logo-link">
+        <img src="<c:url value='/images/logo-no-bg.png'/>" alt="ArtCake AS">
     </a>
     <div class="topmenu-right">
         <a href="/cart" class="cart-link" title="Handlekurv">
@@ -37,8 +37,8 @@
         <button class="modal-close" onclick="window.history.back()">&times;</button>
         <div class="modal-body">
             <div class="modal-images">
-                <img src="${cake.imageUrl}" alt="${cake.name}" class="modal-image">
-                <img src="${cake.imageUrl2}" alt="${cake.name}" class="modal-image">
+                <img src="<c:url value='${cake.imageUrl}'/>" alt="${cake.name}" class="modal-image">
+                <img src="<c:url value='${cake.imageUrl2}'/>" alt="${cake.name}" class="modal-image">
             </div>
 
             <div class="modal-info-section">

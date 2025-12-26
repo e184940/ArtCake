@@ -1,16 +1,17 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html lang="no">
 <head>
-    <link href="/css/style.css" rel="stylesheet">
+    <link href="<c:url value='/css/style.css'/>" rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hjem - ArtCake AS</title>
 </head>
 <body>
 <div class="topmenu">
-    <a href="/" class="logo-link">
-        <img src="/images/logo_hvit_nobg.png" alt="ArtCake AS">
+    <a href="<c:url value='/'/>" class="logo-link">
+        <img src="<c:url value='/images/logo-no-bg.png'/>" alt="ArtCake AS">
     </a>
     <div class="topmenu-right">
         <a href="/cart" class="cart-link" title="Handlekurv">
@@ -43,7 +44,7 @@
         <p>Alt vi gjør, gjør vi med formål om å lage de <strong>deiligste kakene</strong> du noensinne har smakt!</p>
         <p>Vi lager alt fra store saftige honningkaker, til små deilige sjokoloadekaker.</p>
         <p>Fine kaker med personlige meldinger eller pynt ordner vi selvsagt også!</p>
-        <img src="/images/logo-no-bg.png">
+        <img src="<c:url value='/images/logo-no-bg.png'/>">
     </div>
 </main>
 

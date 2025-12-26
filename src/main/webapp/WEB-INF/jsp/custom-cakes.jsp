@@ -10,8 +10,8 @@
 </head>
 <body>
 <div class="topmenu">
-    <a href="/" class="logo-link">
-        <img src="/images/logo_hvit_nobg.png" alt="ArtCake AS">
+    <a href="<c:url value='/'/>" class="logo-link">
+        <img src="<c:url value='/images/logo-no-bg.png'/>" alt="ArtCake AS">
     </a>
     <div class="topmenu-right">
         <a href="/cart" class="cart-link" title="Handlekurv">
