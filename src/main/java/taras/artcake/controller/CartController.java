@@ -9,11 +9,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import taras.artcake.model.Order;
 import taras.artcake.model.OrderItem;
-import taras.artcake.repository.OrderRepository;
+import taras.artcake.repo.OrderRepository;
 import taras.artcake.service.CartService;
 import taras.artcake.service.EmailService;
 import jakarta.servlet.http.HttpSession;
-import java.io.IOException;
+
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
