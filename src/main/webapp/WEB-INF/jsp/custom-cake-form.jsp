@@ -86,30 +86,47 @@
         const description = document.getElementById('description').value;
         const estimatedPrice = document.getElementById('estimatedPrice').value || '500';
         const fileInput = document.getElementById('inspiration');
+        const submitBtn = document.querySelector('button[type="submit"]');
+
+        // Disable submit button and show loading
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Laster opp...';
+
+        const formData = new FormData();
+        formData.append('description', description);
+        formData.append('price', parseFloat(estimatedPrice));
 
         if (fileInput.files.length > 0) {
-            // If image is uploaded, we'd need to handle file upload
-            // For now, just use placeholder
-            addCustomToCart(description, '', parseFloat(estimatedPrice));
-        } else {
-            addCustomToCart(description, '', parseFloat(estimatedPrice));
+            console.log('Uploading file:', fileInput.files[0].name, 'Size:', fileInput.files[0].size);
+            formData.append('inspirationImage', fileInput.files[0]);
         }
-    }
 
-    function addCustomToCart(description, imageUrl, price) {
         fetch('/cart/add-custom', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: 'description=' + encodeURIComponent(description) +
-                  '&imageUrl=' + encodeURIComponent(imageUrl) +
-                  '&price=' + price
-        }).then(() => {
-            alert('Personlig kakebestilling lagt til handlekurv!');
-            window.location.href = '/cart';
+            body: formData
+        }).then(response => response.text())
+        .then(result => {
+            console.log('Server response:', result);
+            if (result === 'added') {
+                alert('Personlig kakebestilling lagt til handlekurv!');
+                window.location.href = '/cart';
+            } else if (result.startsWith('error:')) {
+                alert('Feil ved bestilling: ' + result.substring(6));
+                // Re-enable button
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Legg i handlekurv';
+            } else {
+                alert('Feil ved bestilling: ' + result);
+                // Re-enable button
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Legg i handlekurv';
+            }
         }).catch(err => {
+            console.error('Network error:', err);
             alert('Feil ved bestilling: ' + err);
+            // Re-enable button
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Legg i handlekurv';
         });
     }
 

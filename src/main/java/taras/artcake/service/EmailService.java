@@ -4,10 +4,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import jakarta.mail.internet.MimeMessage;
+import java.io.File;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 @Service
@@ -23,9 +30,23 @@ public class EmailService {
     @Value("${app.mail.from:artcake@artcake.no}")
     private String mailFrom;
 
+    @Value("${app.base-url:http://localhost:8080}")
+    private String appBaseUrl;
+
     public void sendOrderEmail(String customerName, String customerEmail, String customerPhone,
                                String deliveryDate, String notes,
                                List<CartService.CartItemDTO> cartItems, BigDecimal cartTotal) {
+
+        logger.info("=== SENDING ORDER EMAIL ===");
+        for (CartService.CartItemDTO item : cartItems) {
+            if ("custom".equals(item.getItemType())) {
+                logger.info("Custom cake item - Description: {}", item.getCustomDescription());
+                logger.info("Custom cake item - Image URL: {}", item.getCustomImageUrl());
+                if (item.getCustomImageUrl() != null && !item.getCustomImageUrl().trim().isEmpty()) {
+                    logger.info("Will send image as EMAIL ATTACHMENT instead of URL");
+                }
+            }
+        }
 
         // Send email to konditor (ArtCake)
         sendOrderEmailToKonditor(customerName, customerEmail, customerPhone,
@@ -80,18 +101,70 @@ public class EmailService {
                                List<CartService.CartItemDTO> cartItems, BigDecimal cartTotal) {
 
         try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setTo(ARTCAKE_EMAIL);
-            message.setFrom(mailFrom);
-            message.setSubject("Ny bestilling fra " + customerName);
-            message.setText(buildOrderEmailContent(customerName, customerEmail, customerPhone,
-                                                   deliveryDate, notes, cartItems, cartTotal));
+            // Check if any custom items have images that need to be attached
+            boolean hasCustomImages = cartItems.stream()
+                .anyMatch(item -> "custom".equals(item.getItemType()) &&
+                         item.getCustomImageUrl() != null &&
+                         !item.getCustomImageUrl().trim().isEmpty());
 
-            logger.info("Sender bestillingsepost til konditor: " + ARTCAKE_EMAIL);
-            mailSender.send(message);
-            logger.info("Bestillingsepost sendt til konditor");
+            if (hasCustomImages) {
+                // Use MimeMessage for attachments
+                MimeMessage mimeMessage = mailSender.createMimeMessage();
+                MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+                helper.setTo(ARTCAKE_EMAIL);
+                helper.setFrom(mailFrom);
+                helper.setSubject("Ny bestilling fra " + customerName + " (med inspirasjonsbilde)");
+
+                String emailContent = buildOrderEmailContent(customerName, customerEmail, customerPhone,
+                                                           deliveryDate, notes, cartItems, cartTotal);
+                helper.setText(emailContent);
+
+                // Attach custom images
+                for (CartService.CartItemDTO item : cartItems) {
+                    if ("custom".equals(item.getItemType()) &&
+                        item.getCustomImageUrl() != null &&
+                        !item.getCustomImageUrl().trim().isEmpty()) {
+
+                        String imageUrl = item.getCustomImageUrl();
+                        if (imageUrl.startsWith("/imgs/custom-uploads/")) {
+                            // Find the actual file
+                            String filename = imageUrl.substring("/imgs/custom-uploads/".length());
+                            Path imagePath = Paths.get("src/main/resources/static/imgs/custom-uploads/" + filename);
+
+                            if (!Files.exists(imagePath)) {
+                                // Try target directory
+                                imagePath = Paths.get("target/classes/static/imgs/custom-uploads/" + filename);
+                            }
+
+                            if (Files.exists(imagePath)) {
+                                FileSystemResource file = new FileSystemResource(imagePath.toFile());
+                                helper.addAttachment("Inspirasjonsbilde_" + filename, file);
+                                logger.info("Added inspiration image as attachment: {}", filename);
+                            } else {
+                                logger.warn("Could not find image file for attachment: {}", imagePath);
+                            }
+                        }
+                    }
+                }
+
+                mailSender.send(mimeMessage);
+                logger.info("Order email with attachments sent to konditor");
+
+            } else {
+                // Use simple text message for orders without images
+                SimpleMailMessage message = new SimpleMailMessage();
+                message.setTo(ARTCAKE_EMAIL);
+                message.setFrom(mailFrom);
+                message.setSubject("Ny bestilling fra " + customerName);
+                message.setText(buildOrderEmailContent(customerName, customerEmail, customerPhone,
+                                                       deliveryDate, notes, cartItems, cartTotal));
+                mailSender.send(message);
+                logger.info("Simple order email sent to konditor");
+            }
+
         } catch (Exception e) {
-            logger.warn("Email-sending feilet (bestillingen er likevel lagret): " + e.getMessage());
+            logger.error("Failed to send order email to konditor: {}", e.getMessage(), e);
         }
     }
 
@@ -100,17 +173,68 @@ public class EmailService {
                                                  BigDecimal cartTotal) {
 
         try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setTo(customerEmail);
-            message.setFrom(mailFrom);
-            message.setSubject("Bestillingen din er mottatt - ArtCake AS");
-            message.setText(buildConfirmationEmailContent(customerName, cartItems, cartTotal));
+            // Check if any custom items have images that need to be attached
+            boolean hasCustomImages = cartItems.stream()
+                .anyMatch(item -> "custom".equals(item.getItemType()) &&
+                         item.getCustomImageUrl() != null &&
+                         !item.getCustomImageUrl().trim().isEmpty());
 
-            logger.info("Sender bekreftelsesmail til kunde: " + customerEmail);
-            mailSender.send(message);
-            logger.info("Bekreftelsesmail sendt til kunde");
+            if (hasCustomImages) {
+                // Use MimeMessage for attachments
+                MimeMessage mimeMessage = mailSender.createMimeMessage();
+                MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+                helper.setTo(customerEmail);
+                helper.setFrom(mailFrom);
+                helper.setSubject("Bestillingen din er mottatt - ArtCake AS (med inspirasjonsbilde)");
+
+                String emailContent = buildConfirmationEmailContent(customerName, cartItems, cartTotal);
+                helper.setText(emailContent);
+
+                // Attach custom images
+                for (CartService.CartItemDTO item : cartItems) {
+                    if ("custom".equals(item.getItemType()) &&
+                        item.getCustomImageUrl() != null &&
+                        !item.getCustomImageUrl().trim().isEmpty()) {
+
+                        String imageUrl = item.getCustomImageUrl();
+                        if (imageUrl.startsWith("/imgs/custom-uploads/")) {
+                            // Find the actual file
+                            String filename = imageUrl.substring("/imgs/custom-uploads/".length());
+                            Path imagePath = Paths.get("src/main/resources/static/imgs/custom-uploads/" + filename);
+
+                            if (!Files.exists(imagePath)) {
+                                // Try target directory
+                                imagePath = Paths.get("target/classes/static/imgs/custom-uploads/" + filename);
+                            }
+
+                            if (Files.exists(imagePath)) {
+                                FileSystemResource file = new FileSystemResource(imagePath.toFile());
+                                helper.addAttachment("Ditt_inspirasjonsbilde_" + filename, file);
+                                logger.info("Added inspiration image as attachment for customer: {}", filename);
+                            } else {
+                                logger.warn("Could not find image file for customer attachment: {}", imagePath);
+                            }
+                        }
+                    }
+                }
+
+                mailSender.send(mimeMessage);
+                logger.info("Confirmation email with attachments sent to customer");
+
+            } else {
+                // Use simple text message for orders without images
+                SimpleMailMessage message = new SimpleMailMessage();
+                message.setTo(customerEmail);
+                message.setFrom(mailFrom);
+                message.setSubject("Bestillingen din er mottatt - ArtCake AS");
+                message.setText(buildConfirmationEmailContent(customerName, cartItems, cartTotal));
+                mailSender.send(message);
+                logger.info("Simple confirmation email sent to customer");
+            }
+
         } catch (Exception e) {
-            logger.warn("Email-sending feilet (bestillingen er likevel lagret): " + e.getMessage());
+            logger.error("Failed to send confirmation email to customer: {}", e.getMessage(), e);
         }
     }
 
@@ -149,12 +273,10 @@ public class EmailService {
                 // Add inspiration image if present
                 String imageUrl = item.getCustomImageUrl();
                 if (imageUrl != null && !imageUrl.trim().isEmpty()) {
-                    // Convert relative path to absolute URL
-                    if (imageUrl.startsWith("/")) {
-                        imageUrl = appBaseUrl.replaceAll("/+$", "") + imageUrl;
-                    }
-                    content.append("   Inspirasjonsbilde: ").append(imageUrl).append("\n");
+                    logger.info("Custom cake has inspiration image: {}", imageUrl);
+                    content.append("   Inspirasjonsbilde: Se vedlagte fil\n");
                 } else {
+                    logger.info("No inspiration image provided for custom cake");
                     content.append("   Inspirasjonsbilde: Ingen bilde vedlagt\n");
                 }
 
@@ -206,11 +328,8 @@ public class EmailService {
                 // Add inspiration image if present
                 String imageUrl = item.getCustomImageUrl();
                 if (imageUrl != null && !imageUrl.trim().isEmpty()) {
-                    // Convert relative path to absolute URL
-                    if (imageUrl.startsWith("/")) {
-                        imageUrl = appBaseUrl.replaceAll("/+$", "") + imageUrl;
-                    }
-                    content.append("   Inspirasjonsbilde: ").append(imageUrl).append("\n");
+                    logger.info("Custom cake confirmation has inspiration image: {}", imageUrl);
+                    content.append("   Inspirasjonsbilde: Se vedlagte fil\n");
                 } else {
                     content.append("   Inspirasjonsbilde: Ingen bilde vedlagt\n");
                 }
@@ -234,6 +353,22 @@ public class EmailService {
 
         return content.toString();
     }
-}
 
+    // Simple raw send method useful for test endpoints. Returns true on success.
+    public boolean sendRawEmail(String to, String subject, String body) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(to);
+            message.setFrom(mailFrom);
+            message.setSubject(subject);
+            message.setText(body);
+            mailSender.send(message);
+            logger.info("✓ Raw email sendt til {}", to);
+            return true;
+        } catch (Exception e) {
+            logger.warn("✗ Feil ved sending av raw email til {}: {}", to, e.getMessage());
+            return false;
+        }
+    }
+}
 

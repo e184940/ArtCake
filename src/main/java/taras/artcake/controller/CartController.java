@@ -6,13 +6,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import taras.artcake.model.Order;
 import taras.artcake.model.OrderItem;
 import taras.artcake.repository.OrderRepository;
 import taras.artcake.service.CartService;
 import taras.artcake.service.EmailService;
 import jakarta.servlet.http.HttpSession;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -77,23 +83,103 @@ public class CartController {
     public String addCustomToCart(
             @RequestParam String description,
             @RequestParam(required = false) String imageUrl,
+            @RequestParam(required = false) MultipartFile inspirationImage,
             @RequestParam BigDecimal price,
             HttpSession session) {
 
-        CartService.CartItemDTO item = new CartService.CartItemDTO(
-            System.currentTimeMillis(),
-            "Personlig kake",
-            null,
-            0,
-            price,
-            1,
-            "custom",
-            description,
-            imageUrl
-        );
+        try {
+            String finalImageUrl = imageUrl;
 
-        cartService.addToCart(session, item);
-        return "added";
+            // Handle file upload if present
+            if (inspirationImage != null && !inspirationImage.isEmpty()) {
+                try {
+                    logger.info("Processing file upload - size: {} bytes, name: {}, type: {}",
+                               inspirationImage.getSize(),
+                               inspirationImage.getOriginalFilename(),
+                               inspirationImage.getContentType());
+
+                    // Validate file type
+                    String contentType = inspirationImage.getContentType();
+                    if (contentType == null || !contentType.startsWith("image/")) {
+                        throw new IllegalArgumentException("Kun bildefiler er tillatt (JPG, PNG, GIF)");
+                    }
+
+                    // Validate file size (max 10MB)
+                    if (inspirationImage.getSize() > 10 * 1024 * 1024) {
+                        throw new IllegalArgumentException("Bildet er for stort (maks 10MB)");
+                    }
+
+                    // Use target directory for uploads during development
+                    Path uploadPath = Paths.get("target/classes/static/imgs/custom-uploads/");
+                    if (!Files.exists(uploadPath)) {
+                        Files.createDirectories(uploadPath);
+                        logger.info("Created upload directory: {}", uploadPath.toAbsolutePath());
+                    }
+
+                    // Also create in src for persistence across rebuilds
+                    Path srcUploadPath = Paths.get("src/main/resources/static/imgs/custom-uploads/");
+                    if (!Files.exists(srcUploadPath)) {
+                        Files.createDirectories(srcUploadPath);
+                        logger.info("Created src upload directory: {}", srcUploadPath.toAbsolutePath());
+                    }
+
+                    // Save the uploaded file
+                    String originalFilename = inspirationImage.getOriginalFilename();
+                    if (originalFilename == null || originalFilename.trim().isEmpty()) {
+                        originalFilename = "image.jpg";
+                    }
+
+                    // Clean filename to avoid issues
+                    String cleanFilename = originalFilename.replaceAll("[^a-zA-Z0-9._-]", "_");
+                    String fileName = "custom_" + System.currentTimeMillis() + "_" + cleanFilename;
+
+                    // Save to both locations
+                    Path targetFilePath = uploadPath.resolve(fileName);
+                    Path srcFilePath = srcUploadPath.resolve(fileName);
+
+                    logger.info("Saving file to target: {}", targetFilePath.toAbsolutePath());
+                    Files.copy(inspirationImage.getInputStream(), targetFilePath, StandardCopyOption.REPLACE_EXISTING);
+
+                    // Copy to src as well
+                    Files.copy(targetFilePath, srcFilePath, StandardCopyOption.REPLACE_EXISTING);
+                    logger.info("Copied file to src: {}", srcFilePath.toAbsolutePath());
+
+                    finalImageUrl = "/imgs/custom-uploads/" + fileName;
+                    logger.info("Custom cake inspiration image uploaded successfully: {}", finalImageUrl);
+
+                } catch (Exception e) {
+                    logger.error("Failed to upload inspiration image: {}", e.getMessage(), e);
+                    logger.error("File details - size: {}, content-type: {}, name: {}",
+                               inspirationImage.getSize(),
+                               inspirationImage.getContentType(),
+                               inspirationImage.getOriginalFilename());
+                    // Continue without image but log the error
+                    finalImageUrl = null;
+                }
+            } else {
+                logger.info("No inspiration image provided for custom cake");
+            }
+
+            CartService.CartItemDTO item = new CartService.CartItemDTO(
+                System.currentTimeMillis(),
+                "Personlig kake",
+                null,
+                0,
+                price,
+                1,
+                "custom",
+                description,
+                finalImageUrl
+            );
+
+            logger.info("Created custom cake CartItemDTO with imageUrl: {}", finalImageUrl);
+            cartService.addToCart(session, item);
+            return "added";
+
+        } catch (Exception e) {
+            logger.error("Unexpected error in addCustomToCart: {}", e.getMessage(), e);
+            return "error: " + e.getMessage();
+        }
     }
 
     @PostMapping("/checkout")

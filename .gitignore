@@ -19,6 +19,9 @@ target/
 .DS_Store
 Thumbs.db
 
+# Uploaded files (custom cake inspiration images)
+src/main/resources/static/imgs/custom-uploads/
+
 # Temporary files
 *.tmp
 *.temp
