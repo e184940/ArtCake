@@ -9,14 +9,12 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // Serve static images
+        // Images first - most specific
         registry.addResourceHandler("/images/**")
-                .addResourceLocations("classpath:/static/images/")
-                .setCachePeriod(3600);
+                .addResourceLocations("classpath:/static/images/");
 
-        // Serve CSS files
+        // CSS
         registry.addResourceHandler("/css/**")
-                .addResourceLocations("classpath:/static/css/")
-                .setCachePeriod(3600);
+                .addResourceLocations("classpath:/static/css/");
     }
 }
