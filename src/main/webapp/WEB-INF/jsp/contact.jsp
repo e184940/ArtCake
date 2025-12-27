@@ -11,7 +11,7 @@
 <body>
 <div class="topmenu">
     <a href="<c:url value='/'/>" class="logo-link">
-        <img src="<c:url value='/images/logo-no-bg.png'/>" alt="ArtCake AS">
+        <img src="<c:url value='/images/logo_hvit_nobg.png'/>" alt="ArtCake AS">
     </a>
     <div class="topmenu-right">
         <a href="/cart" class="cart-link" title="Handlekurv">
@@ -56,6 +56,19 @@
 
             <div>
                 <h3>Send en melding</h3>
+
+                <c:if test="${not empty contactSent}">
+                    <div style="background-color: #d4edda; color: #155724; padding: 1rem; margin-bottom: 1rem; border-radius: 4px;">
+                        Meldingen din er sendt! Vi tar kontakt snart.
+                    </div>
+                </c:if>
+
+                <c:if test="${not empty contactError}">
+                    <div style="background-color: #f8d7da; color: #721c24; padding: 1rem; margin-bottom: 1rem; border-radius: 4px;">
+                        ${contactError}
+                    </div>
+                </c:if>
+
                 <form method="POST" action="/contact/send">
                     <div class="form-group">
                         <label for="name">Navn</label>
