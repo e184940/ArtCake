@@ -1,6 +1,7 @@
 package taras.artcake.model;
 
 import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 
 @Entity
@@ -38,7 +39,8 @@ public class OrderItem {
 
     private String itemType; // "standard" eller "custom"
 
-    public OrderItem() {}
+    public OrderItem() {
+    }
 
     public Long getId() {
         return id;

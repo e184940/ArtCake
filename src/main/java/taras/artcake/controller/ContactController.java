@@ -19,10 +19,7 @@ public class ContactController {
     @Autowired
     private EmailService emailService;
 
-    @GetMapping("/contact")
-    public String contactPage() {
-        return "contact"; // resolves to /WEB-INF/jsp/contact.jsp
-    }
+    // @GetMapping("/contact") moved to PageController
 
     @PostMapping("/contact/send")
     public String sendContactMessage(@RequestParam String name,

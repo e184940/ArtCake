@@ -2,10 +2,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
 
 html, body {
-  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  /* keep existing background if present elsewhere; overrides applied later */
-  margin: 0; /* remove default browser margin */
-  padding: 0; /* remove default browser padding */
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    /* keep existing background if present elsewhere; overrides applied later */
+    margin: 0; /* remove default browser margin */
+    padding: 0; /* remove default browser padding */
 }
 
 /* Palette
@@ -46,6 +46,19 @@ html, body {
     display: inline-block;
 }
 
+/* Cart Icon Image */
+.cart-icon-img {
+    height: 22px;
+    width: auto;
+    vertical-align: middle;
+    filter: brightness(0) invert(1); /* Make it white to match other icons/text */
+    transition: transform 0.3s ease;
+}
+
+.cart-link:hover .cart-icon-img {
+    transform: scale(1.1);
+}
+
 /* Make the logo-link a flex container; keep it vertically centered, but limit the logo height so it's not too large */
 .logo-link {
     display: flex;
@@ -54,8 +67,8 @@ html, body {
 }
 
 /* Set a sensible max height for the logo image so it doesn't fill the entire menu height and becomes too big */
-.topmenu img {
-    height: 86px;       /* increased from 80px -> +6px */
+.logo-link img {
+    height: 86px; /* increased from 80px -> +6px */
     max-height: 86px;
     width: auto;
     object-fit: contain;
@@ -64,10 +77,11 @@ html, body {
 
 /* On very small screens, make the logo a bit smaller to keep the header compact */
 @media (max-width: 480px) {
-    .topmenu img {
-        height: 60px;   /* increased from 54px -> +6px */
+    .logo-link img {
+        height: 60px; /* increased from 54px -> +6px */
         max-height: 60px;
     }
+
     .topmenu {
         min-height: 76px; /* increased from 70px -> +6px to match */
     }
@@ -141,14 +155,32 @@ html, body {
 @media screen and (max-width: 768px) {
     .menu-items {
         position: fixed;
-        top: auto;
+        top: 86px; /* Match header height */
         right: 0;
-        left: auto;
-        width: calc(100% - 40px);
-        max-width: 90vw;
+        left: 0;
+        width: 100%;
+        max-width: 100%;
         text-align: center;
         z-index: 999;
         background: linear-gradient(135deg, #0b4a6a 0%, #083c6f 100%);
+        border-radius: 0 0 10px 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    /* Backdrop for closing menu */
+    .menu-backdrop {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 998; /* Behind menu but above content */
+    }
+
+    .menu-backdrop.active {
+        display: block;
     }
 }
 
@@ -156,6 +188,15 @@ html, body {
     .topmenu {
         min-height: 65px;
         padding: 0 14px;
+        position: sticky; /* Make header sticky on mobile */
+        top: 0;
+        z-index: 1000;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .menu-items {
+        top: 65px; /* Match mobile header height */
     }
 
     .topmenu img {
@@ -383,13 +424,13 @@ html, body {
     text-decoration: none;
     border-radius: 6px;
     transition: all 0.25s ease;
-    box-shadow: 0 6px 18px rgba(8,60,111,0.14);
+    box-shadow: 0 6px 18px rgba(8, 60, 111, 0.14);
     border: none;
 }
 
 .btn-details:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(8,60,111,0.18);
+    box-shadow: 0 8px 24px rgba(8, 60, 111, 0.18);
 }
 
 @media (max-width: 768px) {
@@ -760,34 +801,34 @@ html, body {
    ========================= */
 
 html, body {
-  background: #eaf6ff !important; /* soft light-blue background */
+    background: #eaf6ff !important; /* soft light-blue background */
 }
 
 /* Make custom-cakes example cards non-interactive and remove hover effects */
 .custom-section .custom-card,
 .custom-section .custom-card * {
-  pointer-events: none !important;
-  cursor: default !important;
+    pointer-events: none !important;
+    cursor: default !important;
 }
 
 /* Neutralize any hover transforms/shadows for custom cards specifically */
 .custom-section .custom-card:hover,
 .custom-section .custom-card:focus {
-  transform: none !important;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
+    transform: none !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
 }
 
 /* Ensure images don't get pointer cursor or other hover styles */
 .custom-section .product-image img,
 .custom-section .custom-image img {
-  cursor: default !important;
-  transition: none !important;
+    cursor: default !important;
+    transition: none !important;
 }
 
 /* If any button styles are inherited, keep the order button clickable — only target cards */
 .custom-section .custom-button-container a.custom-btn-order {
-  pointer-events: auto !important;
-  cursor: pointer !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
 }
 
 /* end of user-specific tweaks */
@@ -850,14 +891,14 @@ html, body {
 .remove-btn {
     background: transparent;
     color: #083c6f;
-    border: 1px solid rgba(8,60,111,0.12);
+    border: 1px solid rgba(8, 60, 111, 0.12);
     padding: 0.5rem 1rem;
     border-radius: 4px;
     cursor: pointer;
 }
 
 .remove-btn:hover {
-    background: rgba(11,74,106,0.06);
+    background: rgba(11, 74, 106, 0.06);
 }
 
 .cart-summary {
@@ -981,7 +1022,7 @@ html, body {
 
 .confirmation-box {
     background: #f0f9ff;
-    border: 2px solid rgba(8,60,111,0.12);
+    border: 2px solid rgba(8, 60, 111, 0.12);
     border-radius: 8px;
     padding: 3rem 2rem;
     margin-top: 2rem;
@@ -1212,7 +1253,7 @@ html, body {
     font-weight: 600;
     font-size: 16px;
     transition: all 0.3s ease;
-    box-shadow: 0 6px 20px rgba(8,60,111,0.18);
+    box-shadow: 0 6px 20px rgba(8, 60, 111, 0.18);
     width: 100%;
     text-align: center;
     border: none;
@@ -1221,7 +1262,7 @@ html, body {
 
 .btn-order:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(8,60,111,0.22);
+    box-shadow: 0 6px 20px rgba(8, 60, 111, 0.22);
 }
 
 .btn-order:active {
@@ -1254,7 +1295,7 @@ html, body {
 
 .size-option:hover {
     border-color: #0b4a6a;
-    background: rgba(10,74,106,0.04);
+    background: rgba(10, 74, 106, 0.04);
 }
 
 .size-option input[type="radio"] {
@@ -1346,266 +1387,158 @@ html, body {
     }
 }
 
-.custom-section {
-    padding: 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
-}
+/* ============================================
+   KONTAKT (contact.jsp)
+   ============================================ */
 
-.custom-section h1 {
-    text-align: center;
-    font-size: clamp(2rem, 4vw, 3rem);
-    margin-bottom: 1rem;
-    color: #333;
-}
-
-.custom-intro {
-    text-align: center;
-    font-size: 1.1rem;
-    color: #666;
-    margin-bottom: 3rem;
-    max-width: 700px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.custom-button-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 3rem;
-}
-
-.custom-btn-order {
-    display: inline-block;
-    padding: 14px 40px;
-    background: linear-gradient(135deg, #0b4a6a 0%, #083c6f 100%);
-    color: white;
-    text-decoration: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 16px;
-    transition: all 0.25s ease;
-    box-shadow: 0 6px 20px rgba(8, 60, 111, 0.18);
-}
-
-.custom-btn-order:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 26px rgba(8, 60, 111, 0.22);
-}
-
-.custom-card {
-    background: white;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(8,60,111,0.06);
-}
-
-.custom-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.custom-image {
-    width: 100%;
-    height: 280px;
-    overflow: hidden;
-}
-
-.custom-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-
-@media (max-width: 768px) {
-    .custom-section {
-        padding: 1rem;
-    }
-
-    .custom-image {
-        height: 150px;
-    }
-}
-
-@media (max-width: 480px) {
-
-    .custom-image {
-        height: 120px;
-    }
-
-    .custom-section h1 {
-        font-size: 1.5rem;
-        margin-bottom: 1rem;
-    }
-
-    .custom-intro {
-        font-size: 0.9rem;
-    }
-}
-
-/* Replace legacy pink/red accents */
-
-/* previously: background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%); */
-.custom-btn-order {
-    background: linear-gradient(135deg, #0b4a6a 0%, #083c6f 100%);
-}
-
-/* button hover replacements already exist earlier; ensure specific selectors updated */
-
-/* previously .btn-checkout, .btn-order, etc. updated earlier */
-
-/* Confirmation box border and heading colors already changed earlier; replace any remaining usages */
-
-/* Replace alerts/inline red backgrounds */
-.confirmation-box {
-    border: 2px solid rgba(8,60,111,0.12);
-}
-
-.confirmation-box h1 { color: #083c6f; }
-
-/* Replace .confirmation-box color references */
-
-/* Replace size-option hover (already done) */
-
-/* Replace .btn-order box-shadow earlier set to pink — ensure no pink remains */
-.btn-order, .custom-btn-order {
-    box-shadow: 0 6px 20px rgba(8,60,111,0.18) !important;
-}
-
-/* Allergens badge: change from yellow warning to softer blue variant */
-.allergens li {
-    background: #e6f5ff; /* light blue */
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 12px;
-    color: #083c6f; /* navy */
-    border-left: 3px solid #0b4a6a;
-}
-
-/* Replace any direct hex pink references */
-/* Search results earlier listed lines — we've updated main ones. For safety, neutralize specific pink values if still present */
-:root {
-    --accent-pink-1: #083c6f; /* override any leftover pink usages visually */
-}
-
-/* Replace remaining pink/red gradients and colors with navy equivalents */
-
-/* Replace linear-gradient pink -> navy gradient */
-/* find: background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%); */
-/* replace with navy gradient */
-
-/* Instances replaced below */
-
-/* earlier occurrences were in modal and other buttons; make replacements */
-
-/* If any element still references a pink gradient, override with navy */
-.bg-accent-pink-gradient {
-    background: linear-gradient(135deg, #0b4a6a 0%, #083c6f 100%) !important;
-}
-
-/* Replace single pink solid colors */
-.bg-accent-pink {
-    background: #083c6f !important;
-}
-
-.color-accent-pink {
-    color: #083c6f !important;
-}
-
-.border-accent-pink {
-    border-color: rgba(8,60,111,0.12) !important;
-}
-
-/* Replace any remaining accent-color pink for checkboxes/radios */
-input[type="radio"], input[type="checkbox"] {
-    accent-color: #0b4a6a !important;
-}
-
-/* Contact page styles */
 .contact-section {
-    padding: 2rem;
-    max-width: 900px;
+    padding: 3rem 2rem;
+    max-width: 1000px;
     margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-.contact-inner h1 {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-    color: #083c6f;
+.contact-inner {
+    background: white;
+    padding: 3rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.contact-section h1 {
     text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+    color: #333;
 }
 
 .contact-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
+    gap: 4rem;
     align-items: start;
 }
 
 .contact-grid h3 {
+    font-size: 1.3rem;
+    margin-bottom: 0.8rem;
     color: #0b4a6a;
     margin-top: 0;
 }
 
-.contact-grid p, .contact-grid a {
-    color: #333;
+.contact-grid p {
+    font-size: 1.05rem;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
 }
 
-/* Form tweaks */
-.contact-grid .form-group input,
-.contact-grid .form-group textarea {
-    width: 100%;
-    padding: 0.8rem;
-    border: 1px solid #d9e6f2;
-    border-radius: 6px;
-    background: #fff;
-    box-shadow: inset 0 1px 2px rgba(8,60,111,0.02);
-    font-family: inherit;
+.contact-grid a {
+    color: #083c6f;
+    text-decoration: none;
+    font-weight: 500;
 }
 
-.contact-grid .form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
+.contact-grid a:hover {
+    text-decoration: underline;
 }
 
 .btn-submit {
-    display: inline-block;
     background: linear-gradient(135deg, #0b4a6a 0%, #083c6f 100%);
-    color: #fff;
-    padding: 12px 22px;
-    border-radius: 8px;
+    color: white;
+    padding: 14px 28px;
     border: none;
+    border-radius: 6px;
     cursor: pointer;
     font-weight: 600;
-    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    font-size: 1rem;
+    transition: all 0.3s;
+    width: 100%;
+    margin-top: 1rem;
 }
 
 .btn-submit:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(8,60,111,0.14);
+    box-shadow: 0 6px 16px rgba(8, 60, 111, 0.2);
 }
 
-/* Mobile responsive adjustments */
 @media (max-width: 768px) {
     .contact-grid {
         grid-template-columns: 1fr;
+        gap: 3rem;
+    }
+
+    .contact-section {
+        padding: 2rem 1rem;
     }
 
     .contact-inner {
-        padding: 0 0.5rem;
-    }
-
-    .contact-grid .form-group input,
-    .contact-grid .form-group textarea {
-        padding: 0.9rem;
-    }
-
-    .btn-submit {
-        width: 100%;
-        padding: 14px 18px;
+        padding: 2rem;
     }
 }
 
+@media (max-width: 480px) {
+    .contact-section {
+        padding: 1rem;
+    }
+
+    .contact-inner {
+        padding: 1.5rem;
+        margin: 0;
+    }
+
+    .contact-section h1 {
+        font-size: 1.8rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .contact-grid {
+        gap: 2rem;
+    }
+}
+
+/* Footer */
+footer {
+    background-color: #00001d;
+    color: aliceblue;
+    text-align: center;
+    padding: 2rem 1rem;
+    margin-top: auto; /* Push footer to bottom if using flex column layout */
+}
+
+.footer-content a {
+    color: #a8d6ff;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s;
+}
+
+.footer-content a:hover {
+    color: aliceblue;
+    text-decoration: underline;
+}
+
+/* Language Switcher in Menu */
+.lang-switch {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: #a8d6ff;
+}
+
+.lang-switch a {
+    color: #a8d6ff;
+    text-decoration: none;
+    padding: 0 5px;
+    transition: color 0.3s;
+}
+
+.lang-switch a.active {
+    color: aliceblue;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.lang-switch a:hover {
+    color: aliceblue;
+}

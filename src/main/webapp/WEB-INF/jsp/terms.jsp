@@ -1,12 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <!DOCTYPE html>
 <html lang="no">
 <head>
     <link href="<c:url value='/css/style.css'/>" rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vilkår og betingelser - ArtCake AS</title>
+    <title><spring:message code="terms.title"/> - ArtCake AS</title>
 </head>
 <body>
 <div class="topmenu">
@@ -14,8 +15,8 @@
         <img src="<c:url value='/images/logo_hvit_nobg.png'/>" alt="ArtCake AS">
     </a>
     <div class="topmenu-right">
-        <a href="/cart" class="cart-link" title="Handlekurv">
-            <span class="cart-icon">[CART]</span>
+        <a href="/cart" class="cart-link" title="<spring:message code='menu.cart'/>">
+            <img src="<c:url value='/images/handlekurv.png'/>" alt="<spring:message code='menu.cart'/>" class="cart-icon-img">
         </a>
         <div class="hamburger-menu">
             <div class="hamburger">
@@ -24,13 +25,14 @@
                 <span></span>
             </div>
             <nav class="menu-items">
-                <a href="/products">Vårt faste utvalg</a>
-                <a href="/custom-cakes">Personlige kaker</a>
-                <a href="/contact">Kontakt</a>
-                <a href="/faq">FAQ</a>
-                <a href="/reviews">Kundeomtaler</a>
+                <a href="/products"><spring:message code="menu.products"/></a>
+                <a href="/custom-cakes"><spring:message code="menu.custom"/></a>
+                <a href="/contact"><spring:message code="menu.contact"/></a>
+                <a href="/faq"><spring:message code="menu.faq"/></a>
+                <a href="/reviews"><spring:message code="menu.reviews"/></a>
                 <div class="lang-switch">
-                    <a href="?lang=no" class="active">NO</a> | <a href="?lang=en">EN</a>
+                    <spring:message code="menu.language"/>: <a href="?lang=no" class="${pageContext.request.locale.language == 'no' ? 'active' : ''}">NO</a> |
+                    <a href="?lang=en" class="${pageContext.request.locale.language == 'en' ? 'active' : ''}">EN</a>
                 </div>
             </nav>
             <div class="menu-backdrop"></div>
@@ -39,29 +41,32 @@
 </div>
 
 <main class="terms-section" style="padding: 2rem; max-width: 800px; margin: 0 auto;">
-    <h1>Vilkår og betingelser for bestilling</h1>
+    <h1><spring:message code="terms.title"/></h1>
 
     <div class="terms-content" style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-        <h3>1. Bestilling</h3>
-        <p>----</p>
+        <h3><spring:message code="terms.1.title"/></h3>
+        <p><spring:message code="terms.1.text"/></p>
 
-        <h3>2. Priser og betaling</h3>
-        <p>----</p>
+        <h3><spring:message code="terms.2.title"/></h3>
+        <p><spring:message code="terms.2.text"/></p>
 
-        <h3>3. Levering og henting</h3>
-        <p>----</p>
+        <h3><spring:message code="terms.3.title"/></h3>
+        <p><spring:message code="terms.3.text"/></p>
 
-        <h3>4. Avbestilling</h3>
-        <p>----</p>
+        <h3><spring:message code="terms.4.title"/></h3>
+        <p><spring:message code="terms.4.text"/></p>
 
-        <h3>5. Allergener</h3>
-        <p>----</p>
+        <h3><spring:message code="terms.5.title"/></h3>
+        <p><spring:message code="terms.5.text"/></p>
+
+        <h3><spring:message code="terms.6.title"/></h3>
+        <p><spring:message code="terms.6.text"/></p>
     </div>
 </main>
 
 <footer>
     <div class="footer-content">
-        <a href="/terms">Vilkår og betingelser for bestilling</a>
+        <a href="/terms"><spring:message code="footer.terms"/></a>
     </div>
 </footer>
 

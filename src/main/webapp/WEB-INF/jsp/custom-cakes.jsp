@@ -1,12 +1,13 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <!DOCTYPE html>
 <html lang="no">
 <head>
     <link href="/css/style.css" rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personlige kaker - ArtCake AS</title>
+    <title><spring:message code="custom.title"/> - ArtCake AS</title>
 </head>
 <body>
 <div class="topmenu">
@@ -14,8 +15,8 @@
         <img src="<c:url value='/images/logo_hvit_nobg.png'/>" alt="ArtCake AS">
     </a>
     <div class="topmenu-right">
-        <a href="/cart" class="cart-link" title="Handlekurv">
-            <span class="cart-icon">[CART]</span>
+        <a href="/cart" class="cart-link" title="<spring:message code='menu.cart'/>">
+            <img src="<c:url value='/images/handlekurv.png'/>" alt="<spring:message code='menu.cart'/>" class="cart-icon-img">
         </a>
         <div class="hamburger-menu">
             <div class="hamburger">
@@ -24,24 +25,31 @@
                 <span></span>
             </div>
             <nav class="menu-items">
-                <a href="/products">Vårt faste utvalg</a>
-                <a href="/custom-cakes">Personlige kaker</a>
-                <a href="/contact">Kontakt</a>
+                <a href="/products"><spring:message code="menu.products"/></a>
+                <a href="/custom-cakes"><spring:message code="menu.custom"/></a>
+                <a href="/contact"><spring:message code="menu.contact"/></a>
+                <a href="/faq"><spring:message code="menu.faq"/></a>
+                <a href="/reviews"><spring:message code="menu.reviews"/></a>
+                <div class="lang-switch">
+                    <spring:message code="menu.language"/>: <a href="?lang=no" class="${pageContext.request.locale.language == 'no' ? 'active' : ''}">NO</a> |
+                    <a href="?lang=en" class="${pageContext.request.locale.language == 'en' ? 'active' : ''}">EN</a>
+                </div>
             </nav>
+            <div class="menu-backdrop"></div>
         </div>
     </div>
 </div>
 
 <main class="custom-section">
-    <h1>Personlige Kaker</h1>
+    <h1><spring:message code="custom.title"/></h1>
     <p class="custom-intro">
-        Vis din kreativitet! Bestill en helt personlig kake som passer dine ønsker og smaksanledninger.
-        Fra bursdager til bryllupper, vi lager den perfekte kaken for deg.
+        <spring:message code="custom.intro"/>
     </p>
 
     <!-- Center the order button -->
-    <div class="custom-button-container" style="justify-content:center; margin-bottom: 1.5rem;">
-        <a href="/order/custom" class="custom-btn-order">Bestill personlig kake</a>
+    <div class="custom-button-container" style="justify-content:center; margin-bottom: 1.5rem; flex-direction: column; align-items: center;">
+        <a href="/order/custom" class="custom-btn-order"><spring:message code="btn.order"/></a>
+        <p style="margin-top: 0.5rem; font-size: 0.9rem; color: #555;"><spring:message code="custom.note"/></p>
     </div>
 
     <!-- Use the same responsive grid structure as the product list; cards contain ONLY images (no text) -->
@@ -127,7 +135,7 @@
 <script>
     const hamburger = document.querySelector(".hamburger");
     if (hamburger) {
-        hamburger.addEventListener("click", function(){
+        hamburger.addEventListener("click", function () {
             this.classList.toggle("active");
             document.querySelector(".menu-items").classList.toggle("active");
         });

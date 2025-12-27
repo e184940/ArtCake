@@ -18,7 +18,8 @@ public class CakeSize {
     private int sizeCm;
     private BigDecimal price;
 
-    public CakeSize(){}
+    public CakeSize() {
+    }
 
     public int getId() {
         return id;

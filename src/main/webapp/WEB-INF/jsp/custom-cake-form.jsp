@@ -1,12 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <!DOCTYPE html>
 <html lang="no">
 <head>
     <link href="<c:url value='/css/style.css'/>" rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personlig kake - ArtCake AS</title>
+    <title><spring:message code="custom.form.title"/> - ArtCake AS</title>
 </head>
 <body>
 <div class="topmenu">
@@ -14,8 +15,8 @@
         <img src="<c:url value='/images/logo_hvit_nobg.png'/>" alt="ArtCake AS">
     </a>
     <div class="topmenu-right">
-        <a href="/cart" class="cart-link" title="Handlekurv">
-            <span class="cart-icon">[CART]</span>
+        <a href="/cart" class="cart-link" title="<spring:message code='menu.cart'/>">
+            <img src="<c:url value='/images/handlekurv.png'/>" alt="<spring:message code='menu.cart'/>" class="cart-icon-img">
         </a>
         <div class="hamburger-menu">
             <div class="hamburger">
@@ -24,55 +25,75 @@
                 <span></span>
             </div>
             <nav class="menu-items">
-                <a href="/products">Vårt faste utvalg</a>
-                <a href="/custom-cakes">Personlige kaker</a>
-                <a href="/contact">Kontakt</a>
+                <a href="/products"><spring:message code="menu.products"/></a>
+                <a href="/custom-cakes"><spring:message code="menu.custom"/></a>
+                <a href="/contact"><spring:message code="menu.contact"/></a>
+                <a href="/faq"><spring:message code="menu.faq"/></a>
+                <a href="/reviews"><spring:message code="menu.reviews"/></a>
+                <div class="lang-switch">
+                    <spring:message code="menu.language"/>: <a href="?lang=no" class="${pageContext.request.locale.language == 'no' ? 'active' : ''}">NO</a> |
+                    <a href="?lang=en" class="${pageContext.request.locale.language == 'en' ? 'active' : ''}">EN</a>
+                </div>
             </nav>
+            <div class="menu-backdrop"></div>
         </div>
     </div>
 </div>
 
 <main class="custom-form-section">
-    <h1>Bestill Personlig Kake</h1>
+    <h1><spring:message code="custom.form.title"/></h1>
 
     <div class="info-text">
-        <strong>Fortell oss om drømmekaken din!</strong> Beskriv hva du ønsker, og last gjerne opp et inspirasjonsbilde.
-        Vi tar kontakt for å diskutere detaljer og pris.
+        <spring:message code="custom.form.intro"/>
     </div>
 
     <form id="customCakeForm" onsubmit="submitCustomCake(event)">
         <div class="form-group">
-            <label for="description">Beskrivelse av kaken *</label>
+            <label for="description"><spring:message code="custom.form.desc"/></label>
             <textarea id="description" name="description" required
-                      placeholder="Beskriv drømmekaken din... (smak, design, tema, osv.)"></textarea>
+                      placeholder="<spring:message code='custom.form.desc_placeholder'/>"></textarea>
         </div>
 
         <div class="form-group">
-            <label for="inspiration">Inspirasjonsbilde (valgfritt)</label>
+            <label for="inspiration"><spring:message code="custom.form.image"/></label>
             <input type="file" id="inspiration" name="inspiration" accept="image/*">
             <img id="imagePreview" class="preview-image" style="display: none;">
         </div>
 
         <div class="form-group">
-            <label for="estimatedPrice">Estimert budsjett (kr)</label>
+            <label for="estimatedPrice"><spring:message code="custom.form.budget"/></label>
             <input type="number" id="estimatedPrice" name="estimatedPrice"
                    placeholder="F.eks. 500" min="0" step="50">
         </div>
 
         <div class="form-actions">
-            <button type="button" class="btn btn-cancel" onclick="window.history.back()">Avbryt</button>
-            <button type="submit" class="btn btn-submit">Legg i handlekurv</button>
+            <button type="button" class="btn btn-cancel" onclick="window.history.back()"><spring:message code="custom.form.cancel"/></button>
+            <button type="submit" class="btn btn-submit"><spring:message code="btn.add_to_cart"/></button>
         </div>
     </form>
 </main>
 
+<footer>
+    <div class="footer-content">
+        <a href="/terms"><spring:message code="footer.terms"/></a>
+    </div>
+</footer>
+
 <script>
-    // Preview image
-    document.getElementById('inspiration').addEventListener('change', function(e) {
+    // Preview image and validate size
+    document.getElementById('inspiration').addEventListener('change', function (e) {
         const file = e.target.files[0];
         if (file) {
+            // Check file size (10MB limit)
+            if (file.size > 10 * 1024 * 1024) {
+                alert('Bildet er for stort! Maks størrelse er 10MB.');
+                this.value = ''; // Clear the input
+                document.getElementById('imagePreview').style.display = 'none';
+                return;
+            }
+
             const reader = new FileReader();
-            reader.onload = function(event) {
+            reader.onload = function (event) {
                 const preview = document.getElementById('imagePreview');
                 preview.src = event.target.result;
                 preview.style.display = 'block';
@@ -106,23 +127,23 @@
             method: 'POST',
             body: formData
         }).then(response => response.text())
-        .then(result => {
-            console.log('Server response:', result);
-            if (result === 'added') {
-                alert('Personlig kakebestilling lagt til handlekurv!');
-                window.location.href = '/cart';
-            } else if (result.startsWith('error:')) {
-                alert('Feil ved bestilling: ' + result.substring(6));
-                // Re-enable button
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Legg i handlekurv';
-            } else {
-                alert('Feil ved bestilling: ' + result);
-                // Re-enable button
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Legg i handlekurv';
-            }
-        }).catch(err => {
+            .then(result => {
+                console.log('Server response:', result);
+                if (result === 'added') {
+                    alert('Personlig kakebestilling lagt til handlekurv!');
+                    window.location.href = '/cart';
+                } else if (result.startsWith('error:')) {
+                    alert('Feil ved bestilling: ' + result.substring(6));
+                    // Re-enable button
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Legg i handlekurv';
+                } else {
+                    alert('Feil ved bestilling: ' + result);
+                    // Re-enable button
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Legg i handlekurv';
+                }
+            }).catch(err => {
             console.error('Network error:', err);
             alert('Feil ved bestilling: ' + err);
             // Re-enable button
@@ -132,11 +153,21 @@
     }
 
     const hamburger = document.querySelector(".hamburger");
+    const menuItems = document.querySelector(".menu-items");
+    const backdrop = document.querySelector(".menu-backdrop");
+
+    function toggleMenu() {
+        hamburger.classList.toggle("active");
+        menuItems.classList.toggle("active");
+        if (backdrop) backdrop.classList.toggle("active");
+    }
+
     if (hamburger) {
-        hamburger.addEventListener("click", function(){
-            this.classList.toggle("active");
-            document.querySelector(".menu-items").classList.toggle("active");
-        });
+        hamburger.addEventListener("click", toggleMenu);
+    }
+
+    if (backdrop) {
+        backdrop.addEventListener("click", toggleMenu);
     }
 </script>
 </body>

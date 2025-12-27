@@ -1,12 +1,13 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <!DOCTYPE html>
 <html lang="no">
 <head>
     <link href="/css/style.css" rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vårt utvalg - ArtCake AS</title>
+    <title><spring:message code="menu.products"/> - ArtCake AS</title>
 </head>
 <body>
 <div class="topmenu">
@@ -14,8 +15,8 @@
         <img src="<c:url value='/images/logo_hvit_nobg.png'/>" alt="ArtCake AS">
     </a>
     <div class="topmenu-right">
-        <a href="/cart" class="cart-link" title="Handlekurv">
-            <span class="cart-icon">[CART]</span>
+        <a href="/cart" class="cart-link" title="<spring:message code='menu.cart'/>">
+            <img src="<c:url value='/images/handlekurv.png'/>" alt="<spring:message code='menu.cart'/>" class="cart-icon-img">
         </a>
         <div class="hamburger-menu">
             <div class="hamburger">
@@ -24,16 +25,23 @@
                 <span></span>
             </div>
             <nav class="menu-items">
-                <a href="/products">Vårt faste utvalg</a>
-                <a href="/custom-cakes">Personlige kaker</a>
-                <a href="/contact">Kontakt</a>
+                <a href="/products"><spring:message code="menu.products"/></a>
+                <a href="/custom-cakes"><spring:message code="menu.custom"/></a>
+                <a href="/contact"><spring:message code="menu.contact"/></a>
+                <a href="/faq"><spring:message code="menu.faq"/></a>
+                <a href="/reviews"><spring:message code="menu.reviews"/></a>
+                <div class="lang-switch">
+                    <spring:message code="menu.language"/>: <a href="?lang=no" class="${pageContext.request.locale.language == 'no' ? 'active' : ''}">NO</a> |
+                    <a href="?lang=en" class="${pageContext.request.locale.language == 'en' ? 'active' : ''}">EN</a>
+                </div>
             </nav>
+            <div class="menu-backdrop"></div>
         </div>
     </div>
 </div>
 
 <main class="products-section">
-    <h1>Vårt faste utvalg av kaker!</h1>
+    <h1><spring:message code="menu.products"/></h1>
 
     <div class="products-grid">
         <c:forEach var="cake" items="${cakes}">
@@ -44,21 +52,62 @@
                 <div class="product-info">
                     <h2>${cake.name}</h2>
                     <p class="product-description">${cake.description}</p>
-                    <p class="product-price">Fra: ${cake.minPrice} kr</p>
-                    <a href="/products/${cake.id}" class="btn-details">Se detaljer</a>
+                    <p class="product-price"><spring:message code="cart.price"/>: ${cake.minPrice} kr</p>
+                    <button class="btn-details" onclick="openModal(${cake.id})"><spring:message code="btn.details"/></button>
                 </div>
             </div>
         </c:forEach>
     </div>
 </main>
 
+<footer>
+    <div class="footer-content">
+        <a href="/terms"><spring:message code="footer.terms"/></a>
+    </div>
+</footer>
+
 <script>
+    // Hamburger Menu Logic
     const hamburger = document.querySelector(".hamburger");
+    const menuItems = document.querySelector(".menu-items");
+    const backdrop = document.querySelector(".menu-backdrop");
+
+    function toggleMenu() {
+        hamburger.classList.toggle("active");
+        menuItems.classList.toggle("active");
+        if (backdrop) backdrop.classList.toggle("active");
+    }
+
     if (hamburger) {
-        hamburger.addEventListener("click", function(){
-            this.classList.toggle("active");
-            document.querySelector(".menu-items").classList.toggle("active");
-        });
+        hamburger.addEventListener("click", toggleMenu);
+    }
+
+    if (backdrop) {
+        backdrop.addEventListener("click", toggleMenu);
+    }
+
+    // Modal Logic
+    const modal = document.getElementById("productModal");
+
+    function openModal(cakeId) {
+        fetch('/products/' + cakeId + '/details')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('modalBody').innerHTML = html;
+                modal.style.display = "block";
+                document.body.style.overflow = "hidden"; // Prevent scrolling
+            });
+    }
+
+    function closeModal() {
+        modal.style.display = "none";
+        document.body.style.overflow = "auto"; // Enable scrolling
+    }
+
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            closeModal();
+        }
     }
 </script>
 </body>

@@ -49,15 +49,15 @@ public class CartController {
             HttpSession session) {
 
         CartService.CartItemDTO item = new CartService.CartItemDTO(
-            System.currentTimeMillis(),
-            cakeName,
-            cakeSizeId,
-            sizeCm,
-            price,
-            1,
-            "standard",
-            null,
-            null
+                System.currentTimeMillis(),
+                cakeName,
+                cakeSizeId,
+                sizeCm,
+                price,
+                1,
+                "standard",
+                null,
+                null
         );
 
         cartService.addToCart(session, item);
@@ -94,9 +94,9 @@ public class CartController {
             if (inspirationImage != null && !inspirationImage.isEmpty()) {
                 try {
                     logger.info("Processing file upload - size: {} bytes, name: {}, type: {}",
-                               inspirationImage.getSize(),
-                               inspirationImage.getOriginalFilename(),
-                               inspirationImage.getContentType());
+                            inspirationImage.getSize(),
+                            inspirationImage.getOriginalFilename(),
+                            inspirationImage.getContentType());
 
                     // Validate file type
                     String contentType = inspirationImage.getContentType();
@@ -109,19 +109,26 @@ public class CartController {
                         throw new IllegalArgumentException("Bildet er for stort (maks 10MB)");
                     }
 
-                    // Use target directory for uploads during development
+                    // Use target directory for uploads (works in both dev and prod for runtime)
+                    // In production (jar), we can't write to classpath easily, so we might need an external storage
+                    // For this simple app, we'll try to write to a temp folder or the running directory
+
                     Path uploadPath = Paths.get("target/classes/static/images/custom-uploads/");
                     if (!Files.exists(uploadPath)) {
-                        Files.createDirectories(uploadPath);
-                        logger.info("Created upload directory: {}", uploadPath.toAbsolutePath());
+                        // Fallback for production/docker where target might not exist in the same way
+                        uploadPath = Paths.get("static/images/custom-uploads/");
+                        if (!Files.exists(uploadPath)) {
+                             try {
+                                 Files.createDirectories(uploadPath);
+                             } catch (Exception ex) {
+                                 // Absolute fallback to temp dir if we can't write to app dir
+                                 uploadPath = Paths.get(System.getProperty("java.io.tmpdir"), "artcake-uploads");
+                                 Files.createDirectories(uploadPath);
+                             }
+                        }
                     }
 
-                    // Also create in src for persistence across rebuilds
-                    Path srcUploadPath = Paths.get("src/main/resources/static/images/custom-uploads/");
-                    if (!Files.exists(srcUploadPath)) {
-                        Files.createDirectories(srcUploadPath);
-                        logger.info("Created src upload directory: {}", srcUploadPath.toAbsolutePath());
-                    }
+                    logger.info("Using upload directory: {}", uploadPath.toAbsolutePath());
 
                     // Save the uploaded file
                     String originalFilename = inspirationImage.getOriginalFilename();
@@ -133,43 +140,61 @@ public class CartController {
                     String cleanFilename = originalFilename.replaceAll("[^a-zA-Z0-9._-]", "_");
                     String fileName = "custom_" + System.currentTimeMillis() + "_" + cleanFilename;
 
-                    // Save to both locations
+                    // Save to location
                     Path targetFilePath = uploadPath.resolve(fileName);
-                    Path srcFilePath = srcUploadPath.resolve(fileName);
-
-                    logger.info("Saving file to target: {}", targetFilePath.toAbsolutePath());
+                    logger.info("Saving file to: {}", targetFilePath.toAbsolutePath());
                     Files.copy(inspirationImage.getInputStream(), targetFilePath, StandardCopyOption.REPLACE_EXISTING);
 
-                    // Copy to src as well
-                    Files.copy(targetFilePath, srcFilePath, StandardCopyOption.REPLACE_EXISTING);
-                    logger.info("Copied file to src: {}", srcFilePath.toAbsolutePath());
+                    // Try to copy to src for local dev persistence, but ignore errors
+                    try {
+                        Path srcUploadPath = Paths.get("src/main/resources/static/images/custom-uploads/");
+                        if (Files.exists(srcUploadPath)) {
+                             Path srcFilePath = srcUploadPath.resolve(fileName);
+                             Files.copy(targetFilePath, srcFilePath, StandardCopyOption.REPLACE_EXISTING);
+                             logger.info("Copied file to src: {}", srcFilePath.toAbsolutePath());
+                        }
+                    } catch (Exception e) {
+                        logger.warn("Could not copy to src (expected in production): {}", e.getMessage());
+                    }
 
+                    // Construct the URL - if we used temp dir, this URL won't work for static serving
+                    // But for email attachment it might be fine if we handle it right
+                    // For now, let's assume we are in a standard structure or local dev
                     finalImageUrl = "/images/custom-uploads/" + fileName;
+
+                    // If we used a temp dir outside static resources, we need to store the absolute path
+                    // so EmailService can find it, even if the web browser can't see it
+                    if (!targetFilePath.toAbsolutePath().toString().contains("static/images")) {
+                         finalImageUrl = targetFilePath.toAbsolutePath().toString();
+                    }
+
                     logger.info("Custom cake inspiration image uploaded successfully: {}", finalImageUrl);
 
                 } catch (Exception e) {
                     logger.error("Failed to upload inspiration image: {}", e.getMessage(), e);
                     logger.error("File details - size: {}, content-type: {}, name: {}",
-                               inspirationImage.getSize(),
-                               inspirationImage.getContentType(),
-                               inspirationImage.getOriginalFilename());
+                            inspirationImage.getSize(),
+                            inspirationImage.getContentType(),
+                            inspirationImage.getOriginalFilename());
                     // Continue without image but log the error
                     finalImageUrl = null;
+                    // Re-throw exception to inform the user
+                    throw new RuntimeException("Feil ved opplasting av bilde: " + e.getMessage());
                 }
             } else {
                 logger.info("No inspiration image provided for custom cake");
             }
 
             CartService.CartItemDTO item = new CartService.CartItemDTO(
-                System.currentTimeMillis(),
-                "Personlig kake",
-                null,
-                0,
-                price,
-                1,
-                "custom",
-                description,
-                finalImageUrl
+                    System.currentTimeMillis(),
+                    "Personlig kake",
+                    null,
+                    0,
+                    price,
+                    1,
+                    "custom",
+                    description,
+                    finalImageUrl
             );
 
             logger.info("Created custom cake CartItemDTO with imageUrl: {}", finalImageUrl);
@@ -250,7 +275,7 @@ public class CartController {
             // Send email til konditor og kunde
             logger.info("Sender eposter...");
             emailService.sendOrderEmail(customerName, customerEmail, customerPhone,
-                                       deliveryDate, notes, cartItems, cartTotal);
+                    deliveryDate, notes, cartItems, cartTotal);
 
             // Tøm handlekurven
             cartService.clearCart(session);

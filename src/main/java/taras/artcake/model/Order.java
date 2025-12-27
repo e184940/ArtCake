@@ -2,6 +2,7 @@ package taras.artcake.model;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -37,7 +38,8 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> items = new ArrayList<>();
 
-    public Order() {}
+    public Order() {
+    }
 
     public Long getId() {
         return id;

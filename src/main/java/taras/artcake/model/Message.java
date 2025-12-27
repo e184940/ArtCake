@@ -1,6 +1,7 @@
 package taras.artcake.model;
 
 import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -20,7 +21,8 @@ public class Message {
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    public Message() {}
+    public Message() {
+    }
 
     public Message(String name, String email, String message) {
         this.name = name;

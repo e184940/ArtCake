@@ -1,12 +1,13 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <!DOCTYPE html>
 <html lang="no">
 <head>
     <link href="<c:url value='/css/style.css'/>" rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kontakt - ArtCake AS</title>
+    <title><spring:message code="contact.title"/> - ArtCake AS</title>
 </head>
 <body>
 <div class="topmenu">
@@ -14,8 +15,8 @@
         <img src="<c:url value='/images/logo_hvit_nobg.png'/>" alt="ArtCake AS">
     </a>
     <div class="topmenu-right">
-        <a href="/cart" class="cart-link" title="Handlekurv">
-            <span class="cart-icon">[CART]</span>
+        <a href="/cart" class="cart-link" title="<spring:message code='menu.cart'/>">
+            <img src="<c:url value='/images/handlekurv.png'/>" alt="<spring:message code='menu.cart'/>" class="cart-icon-img">
         </a>
         <div class="hamburger-menu">
             <div class="hamburger">
@@ -24,66 +25,73 @@
                 <span></span>
             </div>
             <nav class="menu-items">
-                <a href="/products">Vårt faste utvalg</a>
-                <a href="/custom-cakes">Personlige kaker</a>
-                <a href="/contact">Kontakt</a>
+                <a href="/products"><spring:message code="menu.products"/></a>
+                <a href="/custom-cakes"><spring:message code="menu.custom"/></a>
+                <a href="/contact"><spring:message code="menu.contact"/></a>
+                <a href="/faq"><spring:message code="menu.faq"/></a>
+                <a href="/reviews"><spring:message code="menu.reviews"/></a>
+                <div class="lang-switch">
+                    <spring:message code="menu.language"/>: <a href="?lang=no" class="${pageContext.request.locale.language == 'no' ? 'active' : ''}">NO</a> |
+                    <a href="?lang=en" class="${pageContext.request.locale.language == 'en' ? 'active' : ''}">EN</a>
+                </div>
             </nav>
+            <div class="menu-backdrop"></div>
         </div>
     </div>
 </div>
 
 <main class="contact-section">
     <div class="contact-inner">
-        <h1>Kontakt oss</h1>
+        <h1><spring:message code="contact.title"/></h1>
 
         <div class="contact-grid">
             <div>
-                <h3>Adresse</h3>
+                <h3><spring:message code="contact.address"/></h3>
                 <p>Art Cake Studio AS<br>Matti Aikios vei 8<br>8019, Bodø</p>
                 <br>
 
-                <h3>Kontakt</h3>
-                <p>Epost: <a href="mailto:artcake@artcake.no">artcake@artcake.no</a><br>
-                   Telefon: <a href="tel:+4791794812">+47 917 94 812</a></p>
+                <h3><spring:message code="contact.contact"/></h3>
+                <p><spring:message code="contact.email"/>: <a href="mailto:artcake@artcake.no">artcake@artcake.no</a><br>
+                    <spring:message code="cart.phone"/>: <a href="tel:+4791794812">+47 917 94 812</a></p>
                 <br>
 
-                <h3>Følg oss</h3>
+                <h3><spring:message code="contact.follow"/></h3>
                 <p>
-                    <a href="https://www.facebook.com/artcake" target="_blank">Facebook</a><br>
-                    <a href="https://www.instagram.com/artcake" target="_blank">Instagram</a>
+                    <a href="https://www.facebook.com/profile.php?id=100086608387816" target="_blank">Facebook</a><br>
+                    <a href="https://www.instagram.com/art_cake_bodo/" target="_blank">Instagram</a>
                 </p>
             </div>
 
             <div>
-                <h3>Send en melding</h3>
+                <h3><spring:message code="contact.send_msg"/></h3>
 
                 <c:if test="${not empty contactSent}">
                     <div style="background-color: #d4edda; color: #155724; padding: 1rem; margin-bottom: 1rem; border-radius: 4px;">
-                        Meldingen din er sendt! Vi tar kontakt snart.
+                        <spring:message code="contact.sent"/>
                     </div>
                 </c:if>
 
                 <c:if test="${not empty contactError}">
                     <div style="background-color: #f8d7da; color: #721c24; padding: 1rem; margin-bottom: 1rem; border-radius: 4px;">
-                        ${contactError}
+                            ${contactError}
                     </div>
                 </c:if>
 
                 <form method="POST" action="/contact/send">
                     <div class="form-group">
-                        <label for="name">Navn</label>
+                        <label for="name"><spring:message code="contact.name"/></label>
                         <input type="text" id="name" name="name" required>
                     </div>
                     <div class="form-group">
-                        <label for="email">Epost</label>
+                        <label for="email"><spring:message code="contact.email"/></label>
                         <input type="email" id="email" name="email" required>
                     </div>
                     <div class="form-group">
-                        <label for="message">Melding</label>
+                        <label for="message"><spring:message code="contact.message"/></label>
                         <textarea id="message" name="message" rows="6" required></textarea>
                     </div>
                     <div style="margin-top: 1rem;">
-                        <button type="submit" class="btn-submit">Send melding</button>
+                        <button type="submit" class="btn-submit"><spring:message code="btn.send_message"/></button>
                     </div>
                 </form>
             </div>
@@ -91,13 +99,29 @@
     </div>
 </main>
 
+<footer>
+    <div class="footer-content">
+        <a href="/terms"><spring:message code="footer.terms"/></a>
+    </div>
+</footer>
+
 <script>
     const hamburger = document.querySelector(".hamburger");
+    const menuItems = document.querySelector(".menu-items");
+    const backdrop = document.querySelector(".menu-backdrop");
+
+    function toggleMenu() {
+        hamburger.classList.toggle("active");
+        menuItems.classList.toggle("active");
+        if (backdrop) backdrop.classList.toggle("active");
+    }
+
     if (hamburger) {
-        hamburger.addEventListener("click", function(){
-            this.classList.toggle("active");
-            document.querySelector(".menu-items").classList.toggle("active");
-        });
+        hamburger.addEventListener("click", toggleMenu);
+    }
+
+    if (backdrop) {
+        backdrop.addEventListener("click", toggleMenu);
     }
 </script>
 </body>

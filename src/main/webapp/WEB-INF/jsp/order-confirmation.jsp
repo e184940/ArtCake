@@ -1,12 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <!DOCTYPE html>
 <html lang="no">
 <head>
     <link href="<c:url value='/css/style.css'/>" rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bestilling mottatt - ArtCake AS</title>
+    <title><spring:message code="confirm.title"/> - ArtCake AS</title>
 </head>
 <body>
 <div class="topmenu">
@@ -14,8 +15,8 @@
         <img src="<c:url value='/images/logo_hvit_nobg.png'/>" alt="ArtCake AS">
     </a>
     <div class="topmenu-right">
-        <a href="/cart" class="cart-link" title="Handlekurv">
-            <span class="cart-icon">[CART]</span>
+        <a href="/cart" class="cart-link" title="<spring:message code='menu.cart'/>">
+            <img src="<c:url value='/images/handlekurv.png'/>" alt="<spring:message code='menu.cart'/>" class="cart-icon-img">
         </a>
         <div class="hamburger-menu">
             <div class="hamburger">
@@ -24,39 +25,62 @@
                 <span></span>
             </div>
             <nav class="menu-items">
-                <a href="/products">Vårt faste utvalg</a>
-                <a href="/custom-cakes">Personlige kaker</a>
-                <a href="/contact">Kontakt</a>
+                <a href="/products"><spring:message code="menu.products"/></a>
+                <a href="/custom-cakes"><spring:message code="menu.custom"/></a>
+                <a href="/contact"><spring:message code="menu.contact"/></a>
+                <a href="/faq"><spring:message code="menu.faq"/></a>
+                <a href="/reviews"><spring:message code="menu.reviews"/></a>
+                <div class="lang-switch">
+                    <spring:message code="menu.language"/>: <a href="?lang=no" class="${pageContext.request.locale.language == 'no' ? 'active' : ''}">NO</a> |
+                    <a href="?lang=en" class="${pageContext.request.locale.language == 'en' ? 'active' : ''}">EN</a>
+                </div>
             </nav>
+            <div class="menu-backdrop"></div>
         </div>
     </div>
 </div>
 
 <main class="confirmation-section">
     <div class="confirmation-box">
-        <h1>✓ Bestilling mottatt!</h1>
-        <p>Takk for din bestilling!</p>
+        <h1><spring:message code="confirm.title"/></h1>
+        <p><spring:message code="confirm.subtitle"/></p>
 
         <div class="confirmation-highlight">
-            <p>Vi har mottatt bestillingen din og vil kontakte deg snart for å bekrefte detaljer og pris.</p>
-            <p><strong>Sjekk eposten din</strong> for å se kopien av bestillingen.</p>
+            <p><spring:message code="confirm.text1"/></p>
+            <p><strong><spring:message code="confirm.text2"/></strong></p>
         </div>
 
         <p style="color: #999; font-size: 0.95rem;">
-            En av våre kakemestere vil ta kontakt med deg innen kort tid.
+            <spring:message code="confirm.text3"/>
         </p>
 
-        <a href="/" class="btn-home">Tilbake til forsiden</a>
+        <a href="/" class="btn-home"><spring:message code="confirm.back"/></a>
     </div>
 </main>
 
+<footer>
+    <div class="footer-content">
+        <a href="/terms"><spring:message code="footer.terms"/></a>
+    </div>
+</footer>
+
 <script>
     const hamburger = document.querySelector(".hamburger");
+    const menuItems = document.querySelector(".menu-items");
+    const backdrop = document.querySelector(".menu-backdrop");
+
+    function toggleMenu() {
+        hamburger.classList.toggle("active");
+        menuItems.classList.toggle("active");
+        if (backdrop) backdrop.classList.toggle("active");
+    }
+
     if (hamburger) {
-        hamburger.addEventListener("click", function(){
-            this.classList.toggle("active");
-            document.querySelector(".menu-items").classList.toggle("active");
-        });
+        hamburger.addEventListener("click", toggleMenu);
+    }
+
+    if (backdrop) {
+        backdrop.addEventListener("click", toggleMenu);
     }
 </script>
 </body>

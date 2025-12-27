@@ -18,7 +18,8 @@ public class Allergen {
     @ManyToMany(mappedBy = "allergens")
     private Set<Cake> cakes = new HashSet<>();
 
-    public Allergen(){}
+    public Allergen() {
+    }
 
     public Long getId() {
         return id;
