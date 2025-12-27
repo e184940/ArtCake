@@ -9,6 +9,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.scheduling.annotation.Async;
 import jakarta.mail.internet.MimeMessage;
 import java.io.File;
 import java.math.BigDecimal;
@@ -33,6 +34,7 @@ public class EmailService {
     @Value("${app.base-url:http://localhost:8080}")
     private String appBaseUrl;
 
+    @Async
     public void sendOrderEmail(String customerName, String customerEmail, String customerPhone,
                                String deliveryDate, String notes,
                                List<CartService.CartItemDTO> cartItems, BigDecimal cartTotal) {
@@ -57,6 +59,7 @@ public class EmailService {
     }
 
     // Send a simple contact message to the konditor and optionally confirm to the sender
+    @Async
     public void sendSimpleContactEmail(String senderName, String senderEmail, String body) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
@@ -371,4 +374,3 @@ public class EmailService {
         }
     }
 }
-

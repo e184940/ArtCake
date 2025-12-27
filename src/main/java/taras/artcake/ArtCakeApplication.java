@@ -2,9 +2,11 @@ package taras.artcake;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableAsync;
 import io.github.cdimascio.dotenv.Dotenv;
 
 @SpringBootApplication
+@EnableAsync
 public class ArtCakeApplication {
 
     public static void main(String[] args) {
