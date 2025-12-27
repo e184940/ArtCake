@@ -11,7 +11,7 @@
 </head>
 <body>
 <div class="topmenu">
-    <a href="<c:url value='/'/>" class="logo-link">
+    <a href="/" class="logo-link">
         <img src="<c:url value='/images/logo_hvit_nobg.png'/>" alt="ArtCake AS">
     </a>
     <div class="topmenu-right">
@@ -29,7 +29,7 @@
                 <a href="/custom-cakes"><spring:message code="menu.custom"/></a>
                 <a href="/contact"><spring:message code="menu.contact"/></a>
                 <a href="/faq"><spring:message code="menu.faq"/></a>
-                <a href="/reviews"><spring:message code="menu.reviews"/></a>
+                <%-- <a href="/reviews"><spring:message code="menu.reviews"/></a> --%>
                 <div class="lang-switch">
                     <spring:message code="menu.language"/>: <a href="?lang=no" class="${pageContext.request.locale.language == 'no' ? 'active' : ''}">NO</a> |
                     <a href="?lang=en" class="${pageContext.request.locale.language == 'en' ? 'active' : ''}">EN</a>
@@ -52,8 +52,8 @@
         <p style="margin-top: 0.5rem; font-size: 0.9rem; color: #555;"><spring:message code="custom.note"/></p>
     </div>
 
-    <!-- Use the same responsive grid structure as the product list; cards contain ONLY images (no text) -->
-    <div class="products-grid">
+    <!-- Use the custom grid structure -->
+    <div class="custom-grid">
         <!-- 12 example custom cakes (non-interactive) -->
 
         <div class="product-card custom-card">
@@ -132,13 +132,30 @@
 
 </main>
 
+<footer>
+    <div class="footer-content">
+        <a href="/terms"><spring:message code="footer.terms"/></a>
+    </div>
+</footer>
+
 <script>
+    // Hamburger Menu Logic
     const hamburger = document.querySelector(".hamburger");
+    const menuItems = document.querySelector(".menu-items");
+    const backdrop = document.querySelector(".menu-backdrop");
+
+    function toggleMenu() {
+        hamburger.classList.toggle("active");
+        menuItems.classList.toggle("active");
+        if (backdrop) backdrop.classList.toggle("active");
+    }
+
     if (hamburger) {
-        hamburger.addEventListener("click", function () {
-            this.classList.toggle("active");
-            document.querySelector(".menu-items").classList.toggle("active");
-        });
+        hamburger.addEventListener("click", toggleMenu);
+    }
+
+    if (backdrop) {
+        backdrop.addEventListener("click", toggleMenu);
     }
 </script>
 </body>

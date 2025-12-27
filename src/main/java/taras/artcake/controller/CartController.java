@@ -50,6 +50,7 @@ public class CartController {
 
         CartService.CartItemDTO item = new CartService.CartItemDTO(
                 System.currentTimeMillis(),
+                cakeId,
                 cakeName,
                 cakeSizeId,
                 sizeCm,
@@ -76,6 +77,13 @@ public class CartController {
     public String removeFromCart(@RequestParam Long itemId, HttpSession session) {
         cartService.removeFromCart(session, itemId);
         return "removed";
+    }
+
+    @PostMapping("/update-quantity")
+    @ResponseBody
+    public String updateQuantity(@RequestParam Long itemId, @RequestParam int quantity, HttpSession session) {
+        cartService.updateQuantity(session, itemId, quantity);
+        return "updated";
     }
 
     @PostMapping("/add-custom")
@@ -187,6 +195,7 @@ public class CartController {
 
             CartService.CartItemDTO item = new CartService.CartItemDTO(
                     System.currentTimeMillis(),
+                    null, // No cakeId for custom cakes
                     "Personlig kake",
                     null,
                     0,

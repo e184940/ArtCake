@@ -12,7 +12,8 @@ import java.util.List;
 public class CartService implements Serializable {
 
     public static class CartItemDTO {
-        public Long id;
+        public Long id; // Unique ID for the cart item entry
+        public Long cakeId; // ID of the cake product (for merging)
         public String cakeName;
         public Long cakeSizeId;
         public Integer sizeCm;
@@ -22,10 +23,11 @@ public class CartService implements Serializable {
         public String customDescription;
         public String customImageUrl;
 
-        public CartItemDTO(Long id, String cakeName, Long cakeSizeId, Integer sizeCm,
+        public CartItemDTO(Long id, Long cakeId, String cakeName, Long cakeSizeId, Integer sizeCm,
                            java.math.BigDecimal price, Integer quantity, String itemType,
                            String customDescription, String customImageUrl) {
             this.id = id;
+            this.cakeId = cakeId;
             this.cakeName = cakeName;
             this.cakeSizeId = cakeSizeId;
             this.sizeCm = sizeCm;
@@ -37,41 +39,17 @@ public class CartService implements Serializable {
         }
 
         // Getters for JSP access
-        public Long getId() {
-            return id;
-        }
-
-        public String getCakeName() {
-            return cakeName;
-        }
-
-        public Long getCakeSizeId() {
-            return cakeSizeId;
-        }
-
-        public Integer getSizeCm() {
-            return sizeCm;
-        }
-
-        public java.math.BigDecimal getPrice() {
-            return price;
-        }
-
-        public Integer getQuantity() {
-            return quantity;
-        }
-
-        public String getItemType() {
-            return itemType;
-        }
-
-        public String getCustomDescription() {
-            return customDescription;
-        }
-
-        public String getCustomImageUrl() {
-            return customImageUrl;
-        }
+        public Long getId() { return id; }
+        public Long getCakeId() { return cakeId; }
+        public String getCakeName() { return cakeName; }
+        public Long getCakeSizeId() { return cakeSizeId; }
+        public Integer getSizeCm() { return sizeCm; }
+        public java.math.BigDecimal getPrice() { return price; }
+        public Integer getQuantity() { return quantity; }
+        public void setQuantity(Integer quantity) { this.quantity = quantity; }
+        public String getItemType() { return itemType; }
+        public String getCustomDescription() { return customDescription; }
+        public String getCustomImageUrl() { return customImageUrl; }
     }
 
     public List<CartItemDTO> getCartItems(jakarta.servlet.http.HttpSession session) {
@@ -83,10 +61,42 @@ public class CartService implements Serializable {
         return cart;
     }
 
-    public void addToCart(HttpSession session, CartItemDTO item) {
+    public void addToCart(HttpSession session, CartItemDTO newItem) {
         List<CartItemDTO> cart = getCartItems(session);
-        cart.add(item);
+        boolean found = false;
+
+        // Only merge standard items
+        if ("standard".equals(newItem.itemType)) {
+            for (CartItemDTO item : cart) {
+                if ("standard".equals(item.itemType) &&
+                        item.cakeId != null && item.cakeId.equals(newItem.cakeId) &&
+                        item.cakeSizeId != null && item.cakeSizeId.equals(newItem.cakeSizeId)) {
+                    item.quantity += newItem.quantity;
+                    found = true;
+                    break;
+                }
+            }
+        }
+
+        if (!found) {
+            cart.add(newItem);
+        }
         session.setAttribute("cart", cart);
+    }
+
+    public void updateQuantity(HttpSession session, Long itemId, int newQuantity) {
+        List<CartItemDTO> cart = getCartItems(session);
+        if (newQuantity <= 0) {
+            removeFromCart(session, itemId);
+        } else {
+            for (CartItemDTO item : cart) {
+                if (item.id.equals(itemId)) {
+                    item.quantity = newQuantity;
+                    break;
+                }
+            }
+            session.setAttribute("cart", cart);
+        }
     }
 
     public void removeFromCart(HttpSession session, Long itemId) {

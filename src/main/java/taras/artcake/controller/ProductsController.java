@@ -25,5 +25,10 @@ public class ProductsController {
         return "product-details";
     }
 
+    @GetMapping("/products/{id}/details")
+    public String getProductDetailsModal(@PathVariable Integer id, Model model) {
+        model.addAttribute("cake", cakeRepository.findById(id).orElse(null));
+        return "product-details"; // This JSP should be a fragment, not a full page
+    }
 
 }

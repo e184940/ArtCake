@@ -11,7 +11,7 @@
 </head>
 <body>
 <div class="topmenu">
-    <a href="<c:url value='/'/>" class="logo-link">
+    <a href="/" class="logo-link">
         <img src="<c:url value='/images/logo_hvit_nobg.png'/>" alt="ArtCake AS">
     </a>
     <div class="topmenu-right">
@@ -29,7 +29,7 @@
                 <a href="/custom-cakes"><spring:message code="menu.custom"/></a>
                 <a href="/contact"><spring:message code="menu.contact"/></a>
                 <a href="/faq"><spring:message code="menu.faq"/></a>
-                <a href="/reviews"><spring:message code="menu.reviews"/></a>
+                <%-- <a href="/reviews"><spring:message code="menu.reviews"/></a> --%>
                 <div class="lang-switch">
                     <spring:message code="menu.language"/>: <a href="?lang=no" class="${pageContext.request.locale.language == 'no' ? 'active' : ''}">NO</a> |
                     <a href="?lang=en" class="${pageContext.request.locale.language == 'en' ? 'active' : ''}">EN</a>
@@ -65,6 +65,16 @@
         <a href="/terms"><spring:message code="footer.terms"/></a>
     </div>
 </footer>
+
+<!-- Modal Structure -->
+<div id="productModal" class="modal-overlay">
+    <div class="modal-content">
+        <span class="modal-close" onclick="closeModal()">&times;</span>
+        <div id="modalBody">
+            <!-- Content loaded via AJAX -->
+        </div>
+    </div>
+</div>
 
 <script>
     // Hamburger Menu Logic
@@ -108,6 +118,31 @@
         if (event.target == modal) {
             closeModal();
         }
+    }
+
+    function addToCart() {
+        const selectedSize = document.querySelector('input[name="selectedSize"]:checked');
+        if (!selectedSize) {
+            alert('Vennligst velg en størrelse');
+            return;
+        }
+
+        const cakeId = document.getElementById('detailCakeId').value;
+        const cakeName = document.getElementById('detailCakeName').value;
+        const cakeSizeId = selectedSize.value;
+        const price = selectedSize.getAttribute('data-price');
+        const sizeCm = selectedSize.nextElementSibling.textContent.split(' ')[0];
+
+        fetch('/cart/add-standard', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'cakeId=' + cakeId + '&cakeName=' + encodeURIComponent(cakeName) + '&cakeSizeId=' + cakeSizeId + '&sizeCm=' + sizeCm + '&price=' + price
+        }).then(() => {
+            alert('Lagt til handlekurv!');
+            window.location.href = '/cart';
+        });
     }
 </script>
 </body>

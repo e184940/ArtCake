@@ -11,7 +11,7 @@
 </head>
 <body>
 <div class="topmenu">
-    <a href="<c:url value='/'/>" class="logo-link">
+    <a href="/" class="logo-link">
         <img src="<c:url value='/images/logo_hvit_nobg.png'/>" alt="ArtCake AS">
     </a>
     <div class="topmenu-right">
@@ -29,7 +29,7 @@
                 <a href="/custom-cakes"><spring:message code="menu.custom"/></a>
                 <a href="/contact"><spring:message code="menu.contact"/></a>
                 <a href="/faq"><spring:message code="menu.faq"/></a>
-                <a href="/reviews"><spring:message code="menu.reviews"/></a>
+                <%-- <a href="/reviews"><spring:message code="menu.reviews"/></a> --%>
                 <div class="lang-switch">
                     <spring:message code="menu.language"/>: <a href="?lang=no" class="${pageContext.request.locale.language == 'no' ? 'active' : ''}">NO</a> |
                     <a href="?lang=en" class="${pageContext.request.locale.language == 'en' ? 'active' : ''}">EN</a>
@@ -40,45 +40,45 @@
     </div>
 </div>
 
-<main class="reviews-section" style="padding: 2rem; max-width: 1000px; margin: 0 auto;">
-    <h1 style="text-align: center; margin-bottom: 2rem; color: #333;"><spring:message code="reviews.title"/></h1>
+<main class="reviews-section">
+    <h1><spring:message code="reviews.title"/></h1>
 
-    <div class="reviews-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+    <div class="reviews-grid">
 
-        <div class="review-card" style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-            <div class="stars" style="color: #ffc107; font-size: 1.2rem; margin-bottom: 1rem;">★★★★★</div>
-            <p style="font-style: italic; color: #555; margin-bottom: 1.5rem;">"omtale"</p>
-            <p style="font-weight: bold; color: #0b4a6a;">- kunde</p>
+        <div class="review-card">
+            <div class="stars">★★★★★</div>
+            <p class="review-text">"omtale"</p>
+            <p class="review-author">- kunde</p>
         </div>
 
-        <div class="review-card" style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-            <div class="stars" style="color: #ffc107; font-size: 1.2rem; margin-bottom: 1rem;">★★★★★</div>
-            <p style="font-style: italic; color: #555; margin-bottom: 1.5rem;">"omtale"</p>
-            <p style="font-weight: bold; color: #0b4a6a;">- kunde</p>
+        <div class="review-card">
+            <div class="stars">★★★★★</div>
+            <p class="review-text">"omtale"</p>
+            <p class="review-author">- kunde</p>
         </div>
 
-        <div class="review-card" style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-            <div class="stars" style="color: #ffc107; font-size: 1.2rem; margin-bottom: 1rem;">★★★★★</div>
-            <p style="font-style: italic; color: #555; margin-bottom: 1.5rem;">"omtale"</p>
-            <p style="font-weight: bold; color: #0b4a6a;">- kunde</p>
+        <div class="review-card">
+            <div class="stars">★★★★★</div>
+            <p class="review-text">"omtale"</p>
+            <p class="review-author">- kunde</p>
         </div>
 
-        <div class="review-card" style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-            <div class="stars" style="color: #ffc107; font-size: 1.2rem; margin-bottom: 1rem;">★★★★★</div>
-            <p style="font-style: italic; color: #555; margin-bottom: 1.5rem;">"omtale"</p>
-            <p style="font-weight: bold; color: #0b4a6a;">- kunde</p>
+        <div class="review-card">
+            <div class="stars">★★★★★</div>
+            <p class="review-text">"omtale"</p>
+            <p class="review-author">- kunde</p>
         </div>
 
-        <div class="review-card" style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-            <div class="stars" style="color: #ffc107; font-size: 1.2rem; margin-bottom: 1rem;">★★★★☆</div>
-            <p style="font-style: italic; color: #555; margin-bottom: 1.5rem;">"omtale"</p>
-            <p style="font-weight: bold; color: #0b4a6a;">- kunde</p>
+        <div class="review-card">
+            <div class="stars">★★★★☆</div>
+            <p class="review-text">"omtale"</p>
+            <p class="review-author">- kunde</p>
         </div>
 
-        <div class="review-card" style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-            <div class="stars" style="color: #ffc107; font-size: 1.2rem; margin-bottom: 1rem;">★★★★☆</div>
-            <p style="font-style: italic; color: #555; margin-bottom: 1.5rem;">"omtale"</p>
-            <p style="font-weight: bold; color: #0b4a6a;">- kunde</p>
+        <div class="review-card">
+            <div class="stars">★★★★☆</div>
+            <p class="review-text">"omtale"</p>
+            <p class="review-author">- kunde</p>
         </div>
     </div>
 </main>

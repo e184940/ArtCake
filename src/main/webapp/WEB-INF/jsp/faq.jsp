@@ -11,7 +11,7 @@
 </head>
 <body>
 <div class="topmenu">
-    <a href="<c:url value='/'/>" class="logo-link">
+    <a href="/" class="logo-link">
         <img src="<c:url value='/images/logo_hvit_nobg.png'/>" alt="ArtCake AS">
     </a>
     <div class="topmenu-right">
@@ -29,7 +29,7 @@
                 <a href="/custom-cakes"><spring:message code="menu.custom"/></a>
                 <a href="/contact"><spring:message code="menu.contact"/></a>
                 <a href="/faq"><spring:message code="menu.faq"/></a>
-                <a href="/reviews"><spring:message code="menu.reviews"/></a>
+                <%-- <a href="/reviews"><spring:message code="menu.reviews"/></a> --%>
                 <div class="lang-switch">
                     <spring:message code="menu.language"/>: <a href="?lang=no" class="${pageContext.request.locale.language == 'no' ? 'active' : ''}">NO</a> |
                     <a href="?lang=en" class="${pageContext.request.locale.language == 'en' ? 'active' : ''}">EN</a>
@@ -40,33 +40,58 @@
     </div>
 </div>
 
-<main class="faq-section" style="padding: 2rem; max-width: 800px; margin: 0 auto;">
-    <h1 style="text-align: center; margin-bottom: 2rem; color: #333;"><spring:message code="faq.title"/></h1>
+<main class="faq-section">
+    <h1><spring:message code="faq.title"/></h1>
 
-    <div class="faq-content" style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-        <div class="faq-item" style="margin-bottom: 1.5rem;">
-            <h3 style="color: #0b4a6a; margin-bottom: 0.5rem;"><spring:message code="faq.q1"/></h3>
-            <p style="color: #555; line-height: 1.6;"><spring:message code="faq.a1"/></p>
-        </div>
-
-        <div class="faq-item" style="margin-bottom: 1.5rem;">
-            <h3 style="color: #0b4a6a; margin-bottom: 0.5rem;"><spring:message code="faq.q2"/></h3>
-            <p style="color: #555; line-height: 1.6;"><spring:message code="faq.a2"/></p>
-        </div>
-
-        <div class="faq-item" style="margin-bottom: 1.5rem;">
-            <h3 style="color: #0b4a6a; margin-bottom: 0.5rem;"><spring:message code="faq.q3"/></h3>
-            <p style="color: #555; line-height: 1.6;"><spring:message code="faq.a3"/></p>
-        </div>
-
-        <div class="faq-item" style="margin-bottom: 1.5rem;">
-            <h3 style="color: #0b4a6a; margin-bottom: 0.5rem;"><spring:message code="faq.q4"/></h3>
-            <p style="color: #555; line-height: 1.6;"><spring:message code="faq.a4"/></p>
+    <div class="faq-container">
+        <div class="faq-item">
+            <button class="faq-question">
+                <spring:message code="faq.q1"/>
+                <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-answer">
+                <p><spring:message code="faq.a1"/></p>
+            </div>
         </div>
 
         <div class="faq-item">
-            <h3 style="color: #0b4a6a; margin-bottom: 0.5rem;"><spring:message code="faq.q5"/></h3>
-            <p style="color: #555; line-height: 1.6;"><spring:message code="faq.a5"/></p>
+            <button class="faq-question">
+                <spring:message code="faq.q2"/>
+                <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-answer">
+                <p><spring:message code="faq.a2"/></p>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question">
+                <spring:message code="faq.q3"/>
+                <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-answer">
+                <p><spring:message code="faq.a3"/></p>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question">
+                <spring:message code="faq.q4"/>
+                <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-answer">
+                <p><spring:message code="faq.a4"/></p>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question">
+                <spring:message code="faq.q5"/>
+                <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-answer">
+                <p><spring:message code="faq.a5"/></p>
+            </div>
         </div>
     </div>
 </main>
@@ -95,6 +120,28 @@
     if (backdrop) {
         backdrop.addEventListener("click", toggleMenu);
     }
+
+    // FAQ Accordion Logic
+    const faqQuestions = document.querySelectorAll(".faq-question");
+
+    faqQuestions.forEach(question => {
+        question.addEventListener("click", () => {
+            const answer = question.nextElementSibling;
+            const icon = question.querySelector(".faq-icon");
+
+            // Toggle active class
+            question.classList.toggle("active");
+
+            // Toggle answer visibility
+            if (question.classList.contains("active")) {
+                answer.style.maxHeight = answer.scrollHeight + "px";
+                icon.textContent = "-";
+            } else {
+                answer.style.maxHeight = 0;
+                icon.textContent = "+";
+            }
+        });
+    });
 </script>
 </body>
 </html>

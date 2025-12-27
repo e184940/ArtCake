@@ -129,6 +129,32 @@ public class EmailService {
                         // Prøver å lese filen og sende innholdet
                         try {
                             java.nio.file.Path path = java.nio.file.Paths.get(attachment);
+
+                            // Forsøk å finne filen mer robust
+                            if (!java.nio.file.Files.exists(path)) {
+                                String relativePath = attachment.startsWith("/") ? attachment.substring(1) : attachment;
+
+                                // 1. Sjekk relativt til working dir (f.eks. "uploads/...")
+                                java.nio.file.Path relativePathObj = java.nio.file.Paths.get(relativePath);
+                                if (java.nio.file.Files.exists(relativePathObj)) {
+                                    path = relativePathObj;
+                                }
+                                // 2. Sjekk i target/classes/static (vanlig Spring Boot struktur etter build)
+                                else {
+                                    java.nio.file.Path targetPath = java.nio.file.Paths.get("target", "classes", "static", relativePath);
+                                    if (java.nio.file.Files.exists(targetPath)) {
+                                        path = targetPath;
+                                    }
+                                    // 3. Sjekk src/main/resources/static (lokal utvikling)
+                                    else {
+                                        java.nio.file.Path srcPath = java.nio.file.Paths.get("src", "main", "resources", "static", relativePath);
+                                        if (java.nio.file.Files.exists(srcPath)) {
+                                            path = srcPath;
+                                        }
+                                    }
+                                }
+                            }
+
                             if (java.nio.file.Files.exists(path)) {
                                 byte[] fileBytes = java.nio.file.Files.readAllBytes(path);
                                 String base64Content = java.util.Base64.getEncoder().encodeToString(fileBytes);

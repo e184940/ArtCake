@@ -11,7 +11,7 @@
 </head>
 <body>
 <div class="topmenu">
-    <a href="<c:url value='/'/>" class="logo-link">
+    <a href="/" class="logo-link">
         <img src="<c:url value='/images/logo_hvit_nobg.png'/>" alt="ArtCake AS">
     </a>
     <div class="topmenu-right">
@@ -29,7 +29,7 @@
                 <a href="/custom-cakes"><spring:message code="menu.custom"/></a>
                 <a href="/contact"><spring:message code="menu.contact"/></a>
                 <a href="/faq"><spring:message code="menu.faq"/></a>
-                <a href="/reviews"><spring:message code="menu.reviews"/></a>
+                <%-- <a href="/reviews"><spring:message code="menu.reviews"/></a> --%>
                 <div class="lang-switch">
                     <spring:message code="menu.language"/>: <a href="?lang=no" class="${pageContext.request.locale.language == 'no' ? 'active' : ''}">NO</a> |
                     <a href="?lang=en" class="${pageContext.request.locale.language == 'en' ? 'active' : ''}">EN</a>
