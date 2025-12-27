@@ -121,18 +121,27 @@ public class CartController {
                     // In production (jar), we can't write to classpath easily, so we might need an external storage
                     // For this simple app, we'll try to write to a temp folder or the running directory
 
-                    Path uploadPath = Paths.get("target/classes/static/images/custom-uploads/");
-                    if (!Files.exists(uploadPath)) {
-                        // Fallback for production/docker where target might not exist in the same way
-                        uploadPath = Paths.get("static/images/custom-uploads/");
+                    // Prøv å finne en skrivbar mappe.
+                    // På Railway (og produksjon generelt med JAR) kan vi IKKE skrive til classpath/static.
+                    // Vi må bruke en ekstern mappe eller temp-mappe.
+
+                    Path uploadPath;
+                    boolean isLocalDev = Files.exists(Paths.get("src", "main", "resources"));
+
+                    if (isLocalDev) {
+                        // Lokal utvikling: Lagre i src så det er persistent og reloades
+                        uploadPath = Paths.get("src", "main", "resources", "static", "images", "custom-uploads");
                         if (!Files.exists(uploadPath)) {
-                             try {
-                                 Files.createDirectories(uploadPath);
-                             } catch (Exception ex) {
-                                 // Absolute fallback to temp dir if we can't write to app dir
-                                 uploadPath = Paths.get(System.getProperty("java.io.tmpdir"), "artcake-uploads");
-                                 Files.createDirectories(uploadPath);
-                             }
+                            Files.createDirectories(uploadPath);
+                        }
+                        // Også kopier til target så det vises med en gang uten restart (håndteres lenger ned)
+                    } else {
+                        // Produksjon / Railway: Bruk temp-mappe.
+                        // Dette betyr at bildet IKKE vil være tilgjengelig via URL (http://.../images/...),
+                        // men det vil fungere for e-post vedlegg fordi vi sender filinnholdet.
+                        uploadPath = Paths.get(System.getProperty("java.io.tmpdir"), "artcake-uploads");
+                        if (!Files.exists(uploadPath)) {
+                            Files.createDirectories(uploadPath);
                         }
                     }
 
@@ -153,30 +162,36 @@ public class CartController {
                     logger.info("Saving file to: {}", targetFilePath.toAbsolutePath());
                     Files.copy(inspirationImage.getInputStream(), targetFilePath, StandardCopyOption.REPLACE_EXISTING);
 
-                    // Try to copy to src for local dev persistence, but ignore errors
-                    try {
-                        Path srcUploadPath = Paths.get("src/main/resources/static/images/custom-uploads/");
-                        if (Files.exists(srcUploadPath)) {
-                             Path srcFilePath = srcUploadPath.resolve(fileName);
-                             Files.copy(targetFilePath, srcFilePath, StandardCopyOption.REPLACE_EXISTING);
-                             logger.info("Copied file to src: {}", srcFilePath.toAbsolutePath());
+                    // Hvis lokal utvikling, prøv å kopiere til target også så det vises i nettleser med en gang
+                    if (isLocalDev) {
+                        try {
+                            Path targetStaticPath = Paths.get("target", "classes", "static", "images", "custom-uploads");
+                            if (Files.exists(targetStaticPath.getParent())) { // sjekk at images mappen finnes i target
+                                if (!Files.exists(targetStaticPath)) {
+                                    Files.createDirectories(targetStaticPath);
+                                }
+                                Path targetDest = targetStaticPath.resolve(fileName);
+                                Files.copy(targetFilePath, targetDest, StandardCopyOption.REPLACE_EXISTING);
+                            }
+                        } catch (Exception e) {
+                            logger.warn("Could not copy to target (dev only): {}", e.getMessage());
                         }
-                    } catch (Exception e) {
-                        logger.warn("Could not copy to src (expected in production): {}", e.getMessage());
                     }
 
-                    // Construct the URL - if we used temp dir, this URL won't work for static serving
-                    // But for email attachment it might be fine if we handle it right
-                    // For now, let's assume we are in a standard structure or local dev
-                    finalImageUrl = "/images/custom-uploads/" + fileName;
+                    // Construct the URL/Path for EmailService
+                    // VIKTIG: For EmailService må vi vite hvor filen er FYSISK på disken hvis den ikke er en offentlig URL.
+                    // Hvis vi lagret i temp, MÅ vi bruke absolutt sti.
 
-                    // If we used a temp dir outside static resources, we need to store the absolute path
-                    // so EmailService can find it, even if the web browser can't see it
-                    if (!targetFilePath.toAbsolutePath().toString().contains("static/images")) {
+                    if (isLocalDev) {
+                         // Lokalt: Vi har lagret i static, så vi kan bruke web-sti (som EmailService også prøver å resolve)
+                         // Men for sikkerhets skyld, la oss bruke absolutt sti her også, så slipper EmailService å gjette.
+                         finalImageUrl = targetFilePath.toAbsolutePath().toString();
+                    } else {
+                         // Prod/Railway: Temp mappe - MÅ bruke absolutt sti
                          finalImageUrl = targetFilePath.toAbsolutePath().toString();
                     }
 
-                    logger.info("Custom cake inspiration image uploaded successfully: {}", finalImageUrl);
+                    logger.info("Custom cake inspiration image uploaded successfully. Path for email: {}", finalImageUrl);
 
                 } catch (Exception e) {
                     logger.error("Failed to upload inspiration image: {}", e.getMessage(), e);
