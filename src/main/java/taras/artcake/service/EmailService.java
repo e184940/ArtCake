@@ -148,19 +148,26 @@ public class EmailService {
                                           String notes, List<CartService.CartItemDTO> cartItems,
                                           BigDecimal cartTotal) {
         StringBuilder content = new StringBuilder();
-        content.append("NY BESTILLING!\n\n");
+        content.append("═══════════════════════════════════════\n");
+        content.append("NY BESTILLING!\n");
+        content.append("═══════════════════════════════════════\n\n");
+
         content.append("KUNDEINFO:\n");
+        content.append("─────────────────────────────────────────\n");
         content.append("Navn: ").append(customerName).append("\n");
         content.append("Epost: ").append(customerEmail).append("\n");
         content.append("Telefon: ").append(customerPhone).append("\n");
-        content.append("Levering: ").append(deliveryDate).append("\n\n");
+        content.append("Ønsket leveringsdato: ").append(deliveryDate).append("\n\n");
 
         content.append("BESTILLING:\n");
+        content.append("─────────────────────────────────────────\n");
+
         int itemNumber = 1;
         for (CartService.CartItemDTO item : cartItems) {
             content.append(itemNumber).append(". ");
             if ("standard".equals(item.getItemType())) {
-                content.append(item.getCakeName()).append(" (").append(item.getSizeCm()).append(" cm) - ").append(item.getPrice()).append(" kr\n");
+                content.append(item.getCakeName()).append(" (").append(item.getSizeCm()).append(" cm)\n");
+                content.append("   Pris: ").append(item.getPrice()).append(" kr\n\n");
             } else {
                 content.append("PERSONLIG KAKE\n");
                 content.append("   Beskrivelse: ").append(item.getCustomDescription()).append("\n");
@@ -168,14 +175,25 @@ public class EmailService {
                     content.append("   Bilde-URL: ").append(item.getCustomImageUrl()).append("\n");
                     content.append("   (Vedlegg støttes ikke i denne versjonen av e-postsystemet, se URL)\n");
                 }
-                content.append("   Pris: ").append(item.getPrice()).append(" kr\n");
+                content.append("   Estimert pris: ").append(item.getPrice()).append(" kr\n\n");
             }
             itemNumber++;
         }
-        content.append("\nTOTAL: ").append(cartTotal).append(" kr\n\n");
+
+        content.append("─────────────────────────────────────────\n");
+        content.append("TOTAL: ").append(cartTotal).append(" kr\n\n");
+
         if (notes != null && !notes.isEmpty()) {
-            content.append("NOTATER:\n").append(notes).append("\n");
+            content.append("NOTATER:\n");
+            content.append("─────────────────────────────────────────\n");
+            content.append(notes).append("\n\n");
         }
+
+        content.append("═══════════════════════════════════════\n");
+        content.append("Ta kontakt med kunden på: ").append(customerPhone).append("\n");
+        content.append("eller ").append(customerEmail).append("\n");
+        content.append("═══════════════════════════════════════\n");
+
         return content.toString();
     }
 
@@ -185,9 +203,30 @@ public class EmailService {
         StringBuilder content = new StringBuilder();
         content.append("Hei ").append(customerName).append("!\n\n");
         content.append("Takk for din bestilling hos ArtCake AS.\n\n");
-        content.append("Vi har mottatt bestillingen din på totalt ").append(cartTotal).append(" kr.\n");
-        content.append("Vi kontakter deg snart for bekreftelse.\n\n");
-        content.append("Mvh ArtCake AS");
+
+        content.append("Vi har mottatt din bestilling med følgende detaljer:\n");
+        content.append("═══════════════════════════════════════\n\n");
+
+        int itemNumber = 1;
+        for (CartService.CartItemDTO item : cartItems) {
+            content.append(itemNumber).append(". ");
+            if ("standard".equals(item.getItemType())) {
+                content.append(item.getCakeName()).append(" (").append(item.getSizeCm()).append(" cm)\n");
+                content.append("   Pris: ").append(item.getPrice()).append(" kr\n");
+            } else {
+                content.append("Personlig kake\n");
+                content.append("   ").append(item.getCustomDescription()).append("\n");
+                content.append("   Estimert pris: ").append(item.getPrice()).append(" kr\n");
+            }
+            itemNumber++;
+        }
+
+        content.append("\n═══════════════════════════════════════\n");
+        content.append("Total: ").append(cartTotal).append(" kr\n\n");
+
+        content.append("En av våre kakemestere vil kontakte deg snart for å bekrefte detaljer og gi deg en endelig pris.\n\n");
+        content.append("Takk for at du velger ArtCake!\n\n");
+        content.append("Med vennlig hilsen,\nArtCake AS");
         return content.toString();
     }
 }
