@@ -75,9 +75,9 @@
 <body>
 
 <div id="imageModal" class="image-modal">
-  <img class="modal-content" id="modalImg">
-  <img class="modal-content" id="modalImg">
+  <span class="close" onclick="closeModal()">&times;</span>
   <div id="caption" class="modal-caption"></div>
+  <img class="modal-content" id="modalImg">
 </div>
 
 <div class="admin-header">
@@ -122,7 +122,6 @@
             <td>
                 <div style="font-weight:bold;">${order.customerName}</div>
                 <div style="font-size:0.9em; color:#666;">${order.customerPhone}</div>
-</div>
             </td>
             <td style="font-weight:bold; color:#d35400;">${order.deliveryDate}</td>
             <td>
