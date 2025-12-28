@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -134,40 +135,54 @@ public class EmailService {
                             if (!java.nio.file.Files.exists(path)) {
                                 String relativePath = attachment.startsWith("/") ? attachment.substring(1) : attachment;
 
-                                // 1. Sjekk relativt til working dir (f.eks. "uploads/...")
-                                java.nio.file.Path relativePathObj = java.nio.file.Paths.get(relativePath);
-                                if (java.nio.file.Files.exists(relativePathObj)) {
-                                    path = relativePathObj;
-                                }
-                                // 2. Sjekk i target/classes/static (vanlig Spring Boot struktur etter build)
-                                else {
-                                    java.nio.file.Path targetPath = java.nio.file.Paths.get("target", "classes", "static", relativePath);
-                                    if (java.nio.file.Files.exists(targetPath)) {
-                                        path = targetPath;
+                                // Håndter den nye /custom-image/ ruten
+                                if (attachment.startsWith("/custom-image/")) {
+                                    String filename = attachment.substring("/custom-image/".length());
+                                    // Sjekk lokalt vs prod (samme logikk som ImageController)
+                                    boolean isLocalDev = java.nio.file.Files.exists(java.nio.file.Paths.get("src", "main", "resources"));
+                                    if (isLocalDev) {
+                                        path = java.nio.file.Paths.get("src/main/resources/static/images/custom-uploads/").resolve(filename);
+                                    } else {
+                                        path = java.nio.file.Paths.get(System.getProperty("java.io.tmpdir"), "artcake-uploads").resolve(filename);
                                     }
-                                    // 3. Sjekk src/main/resources/static (lokal utvikling)
+                                }
+                                // Ellers prøv standard logikk
+                                else {
+                                    // 1. Sjekk relativt til working dir (f.eks. "uploads/...")
+                                    java.nio.file.Path relativePathObj = java.nio.file.Paths.get(relativePath);
+                                    if (java.nio.file.Files.exists(relativePathObj)) {
+                                        path = relativePathObj;
+                                    }
+                                    // 2. Sjekk i target/classes/static (vanlig Spring Boot struktur etter build)
                                     else {
-                                        java.nio.file.Path srcPath = java.nio.file.Paths.get("src", "main", "resources", "static", relativePath);
-                                        if (java.nio.file.Files.exists(srcPath)) {
-                                            path = srcPath;
+                                        java.nio.file.Path targetPath = java.nio.file.Paths.get("target", "classes", "static", relativePath);
+                                        if (java.nio.file.Files.exists(targetPath)) {
+                                            path = targetPath;
+                                        }
+                                        // 3. Sjekk src/main/resources/static (lokal utvikling)
+                                        else {
+                                            java.nio.file.Path srcPath = java.nio.file.Paths.get("src", "main", "resources", "static", relativePath);
+                                            if (java.nio.file.Files.exists(srcPath)) {
+                                                path = srcPath;
+                                            }
                                         }
                                     }
                                 }
-                            }
 
-                            if (java.nio.file.Files.exists(path)) {
-                                byte[] fileBytes = java.nio.file.Files.readAllBytes(path);
-                                String base64Content = java.util.Base64.getEncoder().encodeToString(fileBytes);
-                                String filename = path.getFileName().toString();
+                                if (java.nio.file.Files.exists(path)) {
+                                    byte[] fileBytes = java.nio.file.Files.readAllBytes(path);
+                                    String base64Content = java.util.Base64.getEncoder().encodeToString(fileBytes);
+                                    String filename = path.getFileName().toString();
 
-                                attachmentsJson.append(String.format("{\"content\": \"%s\", \"filename\": \"%s\"}", base64Content, filename));
-                            } else {
-                                // Hvis filen ikke finnes (f.eks. lokal web-sti som ikke mapper til filsystemet direkte)
-                                // så skipper vi den for å unngå feil, eller sender path og håper Resend klarer det (tvilsomt for lokale stier)
-                                logger.warn("Fant ikke vedleggsfil på disk: {}", attachment);
-                                // Prøver å sende som path likevel, i tilfelle Resend har magi (eller det er en public URL uten http prefix)
-                                // Men for å være trygg på Railway, skipper vi hvis vi ikke kan lese den.
-                                if (i > 0) continue;
+                                    attachmentsJson.append(String.format("{\"content\": \"%s\", \"filename\": \"%s\"}", base64Content, filename));
+                                } else {
+                                    // Hvis filen ikke finnes (f.eks. lokal web-sti som ikke mapper til filsystemet direkte)
+                                    // så skipper vi den for å unngå feil, eller sender path og håper Resend klarer det (tvilsomt for lokale stier)
+                                    logger.warn("Fant ikke vedleggsfil på disk: {}", attachment);
+                                    // Prøver å sende som path likevel, i tilfelle Resend har magi (eller det er en public URL uten http prefix)
+                                    // Men for å være trygg på Railway, skipper vi hvis vi ikke kan lese den.
+                                    if (i > 0) continue;
+                                }
                             }
                         } catch (Exception e) {
                             logger.error("Feil ved lesing av vedlegg: {}", attachment, e);
@@ -175,7 +190,7 @@ public class EmailService {
                         }
                     }
 
-                    if (i < attachmentUrls.size() - 1) {
+                        if (i < attachmentUrls.size() - 1) {
                         attachmentsJson.append(",");
                     }
                 }

@@ -182,16 +182,10 @@ public class CartController {
                     // VIKTIG: For EmailService må vi vite hvor filen er FYSISK på disken hvis den ikke er en offentlig URL.
                     // Hvis vi lagret i temp, MÅ vi bruke absolutt sti.
 
-                    if (isLocalDev) {
-                         // Lokalt: Vi har lagret i static, så vi kan bruke web-sti (som EmailService også prøver å resolve)
-                         // Men for sikkerhets skyld, la oss bruke absolutt sti her også, så slipper EmailService å gjette.
-                         finalImageUrl = targetFilePath.toAbsolutePath().toString();
-                    } else {
-                         // Prod/Railway: Temp mappe - MÅ bruke absolutt sti
-                         finalImageUrl = targetFilePath.toAbsolutePath().toString();
-                    }
+                    // For visning i admin-panelet bruker vi nå en egen controller-rute som serverer filen dynamisk
+                    finalImageUrl = "/custom-image/" + fileName;
 
-                    logger.info("Custom cake inspiration image uploaded successfully. Path for email: {}", finalImageUrl);
+                    logger.info("Custom cake inspiration image uploaded successfully. URL: {}", finalImageUrl);
 
                 } catch (Exception e) {
                     logger.error("Failed to upload inspiration image: {}", e.getMessage(), e);
