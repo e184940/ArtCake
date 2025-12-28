@@ -31,14 +31,21 @@ public class ImageController {
             // Vi sjekker flere steder for å være sikker på å finne filen
             List<Path> possibleLocations = new ArrayList<>();
 
-            // 1. Sjekk src (lokal utvikling - persistent)
-            possibleLocations.add(Paths.get("src", "main", "resources", "static", "images", "custom-uploads").resolve(filename));
+            // Sjekk om vi er lokalt eller prod (samme logikk som CartController)
+            boolean isLocalDev = java.nio.file.Files.exists(Paths.get("src", "main", "resources"));
 
-            // 2. Sjekk target (lokal kjøring - build output)
-            possibleLocations.add(Paths.get("target", "classes", "static", "images", "custom-uploads").resolve(filename));
+            if (isLocalDev) {
+                // 1. Sjekk src (lokal utvikling - persistent)
+                possibleLocations.add(Paths.get("src", "main", "resources", "static", "images", "custom-uploads").resolve(filename));
+                // 2. Sjekk target (lokal kjøring - build output)
+                possibleLocations.add(Paths.get("target", "classes", "static", "images", "custom-uploads").resolve(filename));
+            } else {
+                // 3. Sjekk persistent volume (Railway)
+                possibleLocations.add(Paths.get("/app/uploads").resolve(filename));
 
-            // 3. Sjekk temp (produksjon / fallback)
-            possibleLocations.add(Paths.get(System.getProperty("java.io.tmpdir"), "artcake-uploads").resolve(filename));
+                // 4. Sjekk temp (fallback)
+                possibleLocations.add(Paths.get(System.getProperty("java.io.tmpdir"), "artcake-uploads").resolve(filename));
+            }
 
             for (Path file : possibleLocations) {
                 if (Files.exists(file) && Files.isReadable(file)) {

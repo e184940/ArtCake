@@ -143,7 +143,14 @@ public class EmailService {
                                     if (isLocalDev) {
                                         path = java.nio.file.Paths.get("src/main/resources/static/images/custom-uploads/").resolve(filename);
                                     } else {
-                                        path = java.nio.file.Paths.get(System.getProperty("java.io.tmpdir"), "artcake-uploads").resolve(filename);
+                                        // Sjekk persistent volume først
+                                        java.nio.file.Path volumePath = java.nio.file.Paths.get("/app/uploads").resolve(filename);
+                                        if (java.nio.file.Files.exists(volumePath)) {
+                                            path = volumePath;
+                                        } else {
+                                            // Fallback til temp
+                                            path = java.nio.file.Paths.get(System.getProperty("java.io.tmpdir"), "artcake-uploads").resolve(filename);
+                                        }
                                     }
                                 }
                                 // Ellers prøv standard logikk
@@ -305,9 +312,11 @@ public class EmailService {
             content.append(itemNumber).append(". ");
             if ("standard".equals(item.getItemType())) {
                 content.append(item.getCakeName()).append(" (").append(item.getSizeCm()).append(" cm)\n");
-                content.append("   Pris: ").append(item.getPrice()).append(" kr\n");
+                content.append("   Antall: ").append(item.getQuantity()).append("\n");
+                content.append("   Pris per stk: ").append(item.getPrice()).append(" kr\n");
             } else {
                 content.append("Personlig kake\n");
+                content.append("   Beskrivelse:\n");
                 content.append("   ").append(item.getCustomDescription()).append("\n");
                 content.append("   Estimert pris: ").append(item.getPrice()).append(" kr\n");
             }

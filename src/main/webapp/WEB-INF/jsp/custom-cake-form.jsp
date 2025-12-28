@@ -63,7 +63,7 @@
         <div class="form-group">
             <label for="estimatedPrice"><spring:message code="custom.form.budget"/></label>
             <input type="number" id="estimatedPrice" name="estimatedPrice"
-                   placeholder="F.eks. 500" min="0" step="50">
+                   placeholder="F.eks. 500" min="0">
         </div>
 
         <div class="form-actions">

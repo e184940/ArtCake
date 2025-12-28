@@ -115,11 +115,9 @@
     <c:forEach var="order" items="${orders}">
         <tr>
             <td>
-                <%-- Format LocalDateTime using JSTL fmt is tricky without extra libs,
-                     so we rely on toString() or handle formatting in Controller/DTO if needed.
-
-                     For simplicity here, we just output it. Ideally, use a custom tag or format in Java. --%>
-                ${fn:replace(order.orderDate, 'T', ' ')}
+                <%-- Format LocalDateTime to just date --%>
+                <c:set var="dateParts" value="${fn:split(order.orderDate, 'T')}" />
+                ${dateParts[0]}
             </td>
             <td>
                 <div style="font-weight:bold;">${order.customerName}</div>
@@ -134,6 +132,11 @@
                             <span>${item.quantity}x ${item.cakeName}</span>
                             <c:if test="${item.itemType == 'custom'}">
                                 <span class="custom-tag">(Custom)</span>
+                                <c:if test="${not empty item.customDescription}">
+                                    <div style="font-size: 0.9em; color: #555; margin-top: 4px; font-style: italic; background: #f9f9f9; padding: 4px; border-radius: 4px;">
+                                        "${item.customDescription}"
+                                    </div>
+                                </c:if>
                             </c:if>
                             <c:if test="${not empty item.customImageUrl}">
                                 <div class="img-link">
@@ -150,7 +153,14 @@
                     </c:forEach>
                 </ul>
             </td>
-            <td>${order.notes}</td>
+            <td>
+                <c:if test="${not empty order.notes}">
+                    <div style="background-color: #fffde7; padding: 8px; border: 1px solid #fff9c4; border-radius: 4px; font-size: 0.9em;">
+                        <strong>Notat:</strong><br>
+                        ${order.notes}
+                    </div>
+                </c:if>
+            </td>
             <td>${order.totalPrice} kr</td>
             <td>
                 <span class="status-badge status-${order.status}">${order.status}</span>

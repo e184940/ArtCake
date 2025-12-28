@@ -136,10 +136,18 @@ public class CartController {
                         }
                         // Også kopier til target så det vises med en gang uten restart (håndteres lenger ned)
                     } else {
-                        // Produksjon / Railway: Bruk temp-mappe.
-                        // Dette betyr at bildet IKKE vil være tilgjengelig via URL (http://.../images/...),
-                        // men det vil fungere for e-post vedlegg fordi vi sender filinnholdet.
-                        uploadPath = Paths.get(System.getProperty("java.io.tmpdir"), "artcake-uploads");
+                        // Produksjon / Railway: Bruk persistent volume hvis tilgjengelig, ellers temp.
+                        // Sjekk om /app/uploads finnes (standard mount path for Railway volumes)
+                        Path volumePath = Paths.get("/app/uploads");
+                        if (Files.exists(volumePath) && Files.isWritable(volumePath)) {
+                             uploadPath = volumePath;
+                             logger.info("Using persistent volume for uploads: {}", uploadPath);
+                        } else {
+                             // Fallback til temp hvis volume ikke er montert
+                             uploadPath = Paths.get(System.getProperty("java.io.tmpdir"), "artcake-uploads");
+                             logger.warn("Persistent volume not found at /app/uploads. Using temp directory: {}", uploadPath);
+                        }
+
                         if (!Files.exists(uploadPath)) {
                             Files.createDirectories(uploadPath);
                         }
