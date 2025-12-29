@@ -139,7 +139,6 @@
                             </c:if>
                             <c:if test="${not empty item.customImageUrl}">
                                 <div class="img-link">
-                                    <%-- Robust filename extraction: Split by '/' and take the last element --%>
                                     <c:set var="pathParts" value="${fn:split(item.customImageUrl, '/')}" />
                                     <c:set var="filename" value="${pathParts[fn:length(pathParts) - 1]}" />
                                     <%-- Construct the clean URL for ImageController --%>

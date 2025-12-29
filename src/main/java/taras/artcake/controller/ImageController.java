@@ -1,7 +1,5 @@
 package taras.artcake.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.MediaType;
@@ -20,8 +18,6 @@ import java.util.List;
 
 @Controller
 public class ImageController {
-
-    private static final Logger logger = LoggerFactory.getLogger(ImageController.class);
 
     @GetMapping({"/custom-image/{filename:.+}", "/images/custom-uploads/{filename:.+}"})
     @ResponseBody
@@ -52,14 +48,11 @@ public class ImageController {
                 }
             }
 
-            logger.warn("Image not found: {}", filename);
             return ResponseEntity.notFound().build();
 
         } catch (MalformedURLException e) {
-            logger.error("Malformed URL: {}", filename, e);
             return ResponseEntity.badRequest().build();
         } catch (Exception e) {
-            logger.error("Error serving image: {}", filename, e);
             return ResponseEntity.internalServerError().build();
         }
     }

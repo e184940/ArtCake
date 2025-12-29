@@ -1,7 +1,5 @@
 package taras.artcake.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,8 +24,6 @@ import java.util.List;
 @Controller
 @RequestMapping("/cart")
 public class CartController {
-
-    private static final Logger logger = LoggerFactory.getLogger(CartController.class);
 
     @Autowired
     private CartService cartService;
@@ -101,11 +97,6 @@ public class CartController {
             // Handle file upload if present
             if (inspirationImage != null && !inspirationImage.isEmpty()) {
                 try {
-                    logger.info("Processing file upload - size: {} bytes, name: {}, type: {}",
-                            inspirationImage.getSize(),
-                            inspirationImage.getOriginalFilename(),
-                            inspirationImage.getContentType());
-
                     // Validate file type
                     String contentType = inspirationImage.getContentType();
                     if (contentType == null || !contentType.startsWith("image/")) {
@@ -141,19 +132,15 @@ public class CartController {
                         Path volumePath = Paths.get("/app/uploads");
                         if (Files.exists(volumePath) && Files.isWritable(volumePath)) {
                              uploadPath = volumePath;
-                             logger.info("Using persistent volume for uploads: {}", uploadPath);
                         } else {
                              // Fallback til temp hvis volume ikke er montert
                              uploadPath = Paths.get(System.getProperty("java.io.tmpdir"), "artcake-uploads");
-                             logger.warn("Persistent volume not found at /app/uploads. Using temp directory: {}", uploadPath);
                         }
 
                         if (!Files.exists(uploadPath)) {
                             Files.createDirectories(uploadPath);
                         }
                     }
-
-                    logger.info("Using upload directory: {}", uploadPath.toAbsolutePath());
 
                     // Save the uploaded file
                     String originalFilename = inspirationImage.getOriginalFilename();
@@ -167,7 +154,6 @@ public class CartController {
 
                     // Save to location
                     Path targetFilePath = uploadPath.resolve(fileName);
-                    logger.info("Saving file to: {}", targetFilePath.toAbsolutePath());
                     Files.copy(inspirationImage.getInputStream(), targetFilePath, StandardCopyOption.REPLACE_EXISTING);
 
                     // Hvis lokal utvikling, prøv å kopiere til target også så det vises i nettleser med en gang
@@ -182,7 +168,7 @@ public class CartController {
                                 Files.copy(targetFilePath, targetDest, StandardCopyOption.REPLACE_EXISTING);
                             }
                         } catch (Exception e) {
-                            logger.warn("Could not copy to target (dev only): {}", e.getMessage());
+                            // Ignore copy error in dev
                         }
                     }
 
@@ -193,21 +179,14 @@ public class CartController {
                     // For visning i admin-panelet bruker vi nå en egen controller-rute som serverer filen dynamisk
                     finalImageUrl = "/custom-image/" + fileName;
 
-                    logger.info("Custom cake inspiration image uploaded successfully. URL: {}", finalImageUrl);
-
                 } catch (Exception e) {
-                    logger.error("Failed to upload inspiration image: {}", e.getMessage(), e);
-                    logger.error("File details - size: {}, content-type: {}, name: {}",
-                            inspirationImage.getSize(),
-                            inspirationImage.getContentType(),
-                            inspirationImage.getOriginalFilename());
                     // Continue without image but log the error
                     finalImageUrl = null;
                     // Re-throw exception to inform the user
                     throw new RuntimeException("Feil ved opplasting av bilde: " + e.getMessage());
                 }
             } else {
-                logger.info("No inspiration image provided for custom cake");
+                // No image provided, use default or leave empty
             }
 
             CartService.CartItemDTO item = new CartService.CartItemDTO(
@@ -223,12 +202,10 @@ public class CartController {
                     finalImageUrl
             );
 
-            logger.info("Created custom cake CartItemDTO with imageUrl: {}", finalImageUrl);
             cartService.addToCart(session, item);
             return "added";
 
         } catch (Exception e) {
-            logger.error("Unexpected error in addCustomToCart: {}", e.getMessage(), e);
             return "error: " + e.getMessage();
         }
     }
@@ -244,22 +221,15 @@ public class CartController {
             HttpSession session) {
 
         try {
-            logger.info("=== CHECKOUT START ===");
-            logger.info("Kunde: " + customerName + " (" + customerEmail + ")");
-
             var cartItems = cartService.getCartItems(session);
             var cartTotal = cartService.getCartTotal(session);
 
-            logger.info("Handlekurv items: " + cartItems.size());
-
             if (cartItems.isEmpty()) {
-                logger.warn("Handlekurven er tom!");
                 model.addAttribute("error", "Handlekurven er tom");
                 return "redirect:/cart";
             }
 
             // Lagre bestilling i databasen
-            logger.info("Lagrer bestilling i database...");
             Order order = new Order();
             order.setCustomerName(customerName);
             order.setCustomerEmail(customerEmail);
@@ -272,7 +242,6 @@ public class CartController {
 
             // Lagre order først
             Order savedOrder = orderRepository.save(order);
-            logger.info("✓ Bestilling lagret med ID: " + savedOrder.getId());
 
             // Lagre order items
             List<OrderItem> orderItems = new ArrayList<>();
@@ -296,22 +265,17 @@ public class CartController {
             }
             savedOrder.setItems(orderItems);
             orderRepository.save(savedOrder);
-            logger.info("✓ Order items lagret: " + orderItems.size());
 
             // Send email til konditor og kunde
-            logger.info("Sender eposter...");
             emailService.sendOrderEmail(customerName, customerEmail, customerPhone,
                     deliveryDate, notes, cartItems, cartTotal);
 
             // Tøm handlekurven
             cartService.clearCart(session);
-            logger.info("✓ Handlekurven tømt");
 
-            logger.info("=== CHECKOUT FULLFØRT ===");
             return "order-confirmation";
 
         } catch (Exception e) {
-            logger.error("✗ FEIL I CHECKOUT: " + e.getMessage(), e);
             model.addAttribute("error", "Feil ved behandling av bestilling: " + e.getMessage());
             return "redirect:/cart";
         }

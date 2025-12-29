@@ -50,10 +50,6 @@
             <p><strong><spring:message code="confirm.text2"/></strong></p>
         </div>
 
-        <p style="color: #999; font-size: 0.95rem;">
-            <spring:message code="confirm.text3"/>
-        </p>
-
         <a href="/" class="btn-home"><spring:message code="confirm.back"/></a>
     </div>
 </main>

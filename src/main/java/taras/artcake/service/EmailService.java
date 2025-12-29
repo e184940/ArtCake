@@ -1,8 +1,8 @@
 package taras.artcake.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -11,16 +11,14 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import java.util.*;
 
 @Service
 public class EmailService {
-
-    private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
 
     @Value("${resend.api.key:}")
     private String resendApiKey;
@@ -39,296 +37,242 @@ public class EmailService {
                 .build();
     }
 
+    @Async
     public void sendOrderEmail(String customerName, String customerEmail, String customerPhone,
                                String deliveryDate, String notes,
-                               List<CartService.CartItemDTO> cartItems, BigDecimal cartTotal) {
+                               List<CartService.CartItemDTO> cartItems, BigDecimal total) {
+        // Send to konditor
+        sendOrderEmailToKonditor(customerName, customerEmail, customerPhone, deliveryDate, notes, cartItems, total);
 
-        CompletableFuture.runAsync(() -> {
-            try {
-                logger.info("=== SENDING ORDER EMAIL VIA RESEND (Background) ===");
+        // Send confirmation to customer
+        sendConfirmationEmailToCustomer(customerName, customerEmail, customerPhone, deliveryDate, notes, cartItems, total);
+    }
 
-                // Samle opp vedlegg (Bilde-URLer)
-                List<String> attachments = new ArrayList<>();
-                for (CartService.CartItemDTO item : cartItems) {
-                    if (item.getCustomImageUrl() != null && !item.getCustomImageUrl().isEmpty()) {
-                        attachments.add(item.getCustomImageUrl());
+    private void sendOrderEmailToKonditor(String customerName, String customerEmail, String customerPhone,
+                                          String deliveryDate, String notes,
+                                          List<CartService.CartItemDTO> cartItems, BigDecimal total) {
+        try {
+            String subject = "NY BESTILLING! - " + customerName;
+            String body = buildOrderEmailBody(customerName, customerEmail, customerPhone, deliveryDate, notes, cartItems, total, true);
+
+            // Collect attachments (custom images)
+            List<String> attachmentPaths = new ArrayList<>();
+            for (CartService.CartItemDTO item : cartItems) {
+                if ("custom".equals(item.itemType) && item.getCustomImageUrl() != null) {
+                    String path = resolvePhysicalPath(item.getCustomImageUrl());
+                    if (path != null) {
+                        attachmentPaths.add(path);
                     }
                 }
-
-                // 1. Send til Konditor (ArtCake) - MED VEDLEGG
-                String konditorSubject = "Ny bestilling fra " + customerName;
-                String konditorBody = buildOrderEmailContent(customerName, customerEmail, customerPhone,
-                        deliveryDate, notes, cartItems, cartTotal);
-
-                sendEmailViaResend(ARTCAKE_EMAIL, konditorSubject, konditorBody, customerEmail, attachments);
-
-                // 2. Send bekreftelse til Kunde - MED VEDLEGG (så kunden ser hva de har sendt)
-                String customerSubject = "Bestillingen din er mottatt - ArtCake AS";
-                String customerBody = buildConfirmationEmailContent(customerName, cartItems, cartTotal);
-
-                sendEmailViaResend(customerEmail, customerSubject, customerBody, ARTCAKE_EMAIL, attachments);
-
-            } catch (Exception e) {
-                logger.error("Critical error in email background task", e);
             }
-        });
+
+            sendEmailViaResend("artcake@artcake.no", subject, body, customerEmail, attachmentPaths);
+
+        } catch (Exception e) {
+            System.err.println("Feil ved sending av ordre-epost til konditor: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
-    public void sendContactMessage(String senderName, String senderEmail, String body) {
-        CompletableFuture.runAsync(() -> {
-            try {
-                // Til ArtCake
-                String subject = "Ny kontaktskjema-melding fra " + senderName;
-                StringBuilder sb = new StringBuilder();
-                sb.append("Melding fra kontaktskjema:\n\n");
-                sb.append("Navn: ").append(senderName).append("\n");
-                sb.append("Epost: ").append(senderEmail).append("\n\n");
-                sb.append(body).append("\n");
+    private void sendConfirmationEmailToCustomer(String customerName, String customerEmail, String customerPhone,
+                                                 String deliveryDate, String notes,
+                                                 List<CartService.CartItemDTO> cartItems, BigDecimal total) {
+        try {
+            String subject = "Ordrebekreftelse - ArtCake";
+            String body = buildOrderEmailBody(customerName, customerEmail, customerPhone, deliveryDate, notes, cartItems, total, false);
 
-                sendEmailViaResend(ARTCAKE_EMAIL, subject, sb.toString(), senderEmail, Collections.emptyList());
-
-                // Bekreftelse til avsender
-                String confSubject = "Takk for din melding til ArtCake";
-                String confBody = "Hei " + senderName + "\n\nTakk for meldingen! Vi vil kontakte deg snart.\n\nMed vennlig hilsen,\nArtCake AS";
-
-                sendEmailViaResend(senderEmail, confSubject, confBody, ARTCAKE_EMAIL, Collections.emptyList());
-
-            } catch (Exception e) {
-                logger.error("Error sending contact form emails", e);
+            // Collect attachments (custom images) - also send back to customer as confirmation
+            List<String> attachmentPaths = new ArrayList<>();
+            for (CartService.CartItemDTO item : cartItems) {
+                if ("custom".equals(item.itemType) && item.getCustomImageUrl() != null) {
+                    String path = resolvePhysicalPath(item.getCustomImageUrl());
+                    if (path != null) {
+                        attachmentPaths.add(path);
+                    }
+                }
             }
-        });
+
+            sendEmailViaResend(customerEmail, subject, body, "artcake@artcake.no", attachmentPaths);
+
+        } catch (Exception e) {
+            System.err.println("Feil ved sending av bekreftelse til kunde: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
-    // Oppdatert metode som støtter vedlegg
-    private void sendEmailViaResend(String to, String subject, String textContent, String replyTo, List<String> attachmentUrls) {
-        if (resendApiKey == null || resendApiKey.isEmpty()) {
-            logger.error("RESEND_API_KEY mangler! Kan ikke sende e-post.");
+    @Async
+    public void sendContactMessage(String name, String email, String message) {
+        try {
+            String subject = "Ny melding fra kontaktskjema - " + name;
+            String body = "Navn: " + name + "\n" +
+                    "Epost: " + email + "\n\n" +
+                    "Melding:\n" + message;
+
+            sendEmailViaResend("artcake@artcake.no", subject, body, email, null);
+
+        } catch (Exception e) {
+            System.err.println("Feil ved sending av kontaktskjema-epost: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void sendEmailViaResend(String to, String subject, String textBody, String replyTo, List<String> attachmentPaths) {
+        String apiKey = System.getenv("RESEND_API_KEY");
+        if (apiKey == null || apiKey.isEmpty()) {
+            apiKey = this.resendApiKey;
+        }
+
+        if (apiKey == null || apiKey.isEmpty()) {
+            System.err.println("Mangler RESEND_API_KEY. Kan ikke sende epost.");
             return;
         }
 
         try {
-            String fromAddress = mailFrom.contains("artcake.no") ? mailFrom : RESEND_FALLBACK_FROM;
-
-            String safeSubject = escapeJson(subject);
-            String safeText = escapeJson(textContent);
-            String safeTo = escapeJson(to);
-            String safeFrom = escapeJson(fromAddress);
-            String safeReplyTo = escapeJson(replyTo);
-
-            // Bygg JSON for vedlegg hvis det finnes
-            StringBuilder attachmentsJson = new StringBuilder();
-            if (attachmentUrls != null && !attachmentUrls.isEmpty()) {
-                attachmentsJson.append(", \"attachments\": [");
-                for (int i = 0; i < attachmentUrls.size(); i++) {
-                    String attachment = attachmentUrls.get(i);
-
-                    // Enkel sjekk: Er det en URL?
-                    if (attachment.startsWith("http://") || attachment.startsWith("https://")) {
-                        attachmentsJson.append(String.format("{\"path\": \"%s\"}", attachment));
-                    } else {
-                        // Antar det er en filsti på serveren (Railway)
-                        // Prøver å lese filen og sende innholdet
+            List<Map<String, Object>> attachments = new ArrayList<>();
+            if (attachmentPaths != null) {
+                for (String pathStr : attachmentPaths) {
+                    Path path = Paths.get(pathStr);
+                    if (Files.exists(path)) {
                         try {
-                            java.nio.file.Path path = java.nio.file.Paths.get(attachment);
+                            byte[] content = Files.readAllBytes(path);
+                            String base64Content = Base64.getEncoder().encodeToString(content);
+                            String filename = path.getFileName().toString();
 
-                            // Forsøk å finne filen mer robust
-                            if (!java.nio.file.Files.exists(path)) {
-                                String relativePath = attachment.startsWith("/") ? attachment.substring(1) : attachment;
-
-                                // Håndter den nye /custom-image/ ruten
-                                if (attachment.startsWith("/custom-image/")) {
-                                    String filename = attachment.substring("/custom-image/".length());
-                                    // Sjekk lokalt vs prod (samme logikk som ImageController)
-                                    boolean isLocalDev = java.nio.file.Files.exists(java.nio.file.Paths.get("src", "main", "resources"));
-                                    if (isLocalDev) {
-                                        path = java.nio.file.Paths.get("src/main/resources/static/images/custom-uploads/").resolve(filename);
-                                    } else {
-                                        // Sjekk persistent volume først
-                                        java.nio.file.Path volumePath = java.nio.file.Paths.get("/app/uploads").resolve(filename);
-                                        if (java.nio.file.Files.exists(volumePath)) {
-                                            path = volumePath;
-                                        } else {
-                                            // Fallback til temp
-                                            path = java.nio.file.Paths.get(System.getProperty("java.io.tmpdir"), "artcake-uploads").resolve(filename);
-                                        }
-                                    }
-                                }
-                                // Ellers prøv standard logikk
-                                else {
-                                    // 1. Sjekk relativt til working dir (f.eks. "uploads/...")
-                                    java.nio.file.Path relativePathObj = java.nio.file.Paths.get(relativePath);
-                                    if (java.nio.file.Files.exists(relativePathObj)) {
-                                        path = relativePathObj;
-                                    }
-                                    // 2. Sjekk i target/classes/static (vanlig Spring Boot struktur etter build)
-                                    else {
-                                        java.nio.file.Path targetPath = java.nio.file.Paths.get("target", "classes", "static", relativePath);
-                                        if (java.nio.file.Files.exists(targetPath)) {
-                                            path = targetPath;
-                                        }
-                                        // 3. Sjekk src/main/resources/static (lokal utvikling)
-                                        else {
-                                            java.nio.file.Path srcPath = java.nio.file.Paths.get("src", "main", "resources", "static", relativePath);
-                                            if (java.nio.file.Files.exists(srcPath)) {
-                                                path = srcPath;
-                                            }
-                                        }
-                                    }
-                                }
-
-                                if (java.nio.file.Files.exists(path)) {
-                                    byte[] fileBytes = java.nio.file.Files.readAllBytes(path);
-                                    String base64Content = java.util.Base64.getEncoder().encodeToString(fileBytes);
-                                    String filename = path.getFileName().toString();
-
-                                    attachmentsJson.append(String.format("{\"content\": \"%s\", \"filename\": \"%s\"}", base64Content, filename));
-                                } else {
-                                    // Hvis filen ikke finnes (f.eks. lokal web-sti som ikke mapper til filsystemet direkte)
-                                    // så skipper vi den for å unngå feil, eller sender path og håper Resend klarer det (tvilsomt for lokale stier)
-                                    logger.warn("Fant ikke vedleggsfil på disk: {}", attachment);
-                                    // Prøver å sende som path likevel, i tilfelle Resend har magi (eller det er en public URL uten http prefix)
-                                    // Men for å være trygg på Railway, skipper vi hvis vi ikke kan lese den.
-                                    if (i > 0) continue;
-                                }
-                            }
-                        } catch (Exception e) {
-                            logger.error("Feil ved lesing av vedlegg: {}", attachment, e);
-                            continue;
+                            Map<String, Object> attachment = new HashMap<>();
+                            attachment.put("filename", filename);
+                            attachment.put("content", base64Content);
+                            attachments.add(attachment);
+                        } catch (IOException e) {
+                            System.err.println("Kunne ikke lese vedlegg: " + pathStr + " - " + e.getMessage());
                         }
-                    }
-
-                        if (i < attachmentUrls.size() - 1) {
-                        attachmentsJson.append(",");
+                    } else {
+                        System.err.println("Vedleggsfil finnes ikke: " + pathStr);
                     }
                 }
-
-                // Clean up trailing comma
-                if (attachmentsJson.length() > 0 && attachmentsJson.charAt(attachmentsJson.length() - 1) == ',') {
-                    attachmentsJson.deleteCharAt(attachmentsJson.length() - 1);
-                }
-
-                attachmentsJson.append("]");
             }
 
-            // Sett sammen hele JSON-kroppen
-            String jsonBody = String.format(
-                    "{\"from\": \"%s\", \"to\": [\"%s\"], \"subject\": \"%s\", \"text\": \"%s\", \"reply_to\": \"%s\"%s}",
-                    safeFrom, safeTo, safeSubject, safeText, safeReplyTo, attachmentsJson.toString()
-            );
+            Map<String, Object> payload = new HashMap<>();
+
+            String fromAddress = (this.mailFrom != null && !this.mailFrom.isEmpty()) ? this.mailFrom : RESEND_FALLBACK_FROM;
+
+            if (!fromAddress.contains("<")) {
+                fromAddress = "ArtCake <" + fromAddress + ">";
+            }
+
+            payload.put("from", fromAddress);
+            payload.put("to", Collections.singletonList(to));
+            payload.put("subject", subject);
+            payload.put("text", textBody);
+            if (replyTo != null) {
+                payload.put("reply_to", replyTo);
+            }
+            if (!attachments.isEmpty()) {
+                payload.put("attachments", attachments);
+            }
+
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonBody = mapper.writeValueAsString(payload);
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create("https://api.resend.com/emails"))
+                    .header("Authorization", "Bearer " + apiKey)
                     .header("Content-Type", "application/json")
-                    .header("Authorization", "Bearer " + resendApiKey)
                     .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
                     .build();
 
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpClient client = this.httpClient;
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            if (response.statusCode() == 200 || response.statusCode() == 201) {
-                logger.info("✓ E-post sendt via Resend til: {} (Reply-To: {}) Med vedlegg: {}", to, replyTo, (attachmentUrls != null ? attachmentUrls.size() : 0));
+            if (response.statusCode() >= 400) {
+                System.err.println("Feil fra Resend API (" + response.statusCode() + "): " + response.body());
             } else {
-                logger.error("✗ Feil fra Resend ({}): {}", response.statusCode(), response.body());
+                System.out.println("Epost sendt til " + to + " via Resend. Status: " + response.statusCode());
             }
 
         } catch (Exception e) {
-            logger.error("Unntak ved sending til Resend: {}", e.getMessage());
+            System.err.println("Unntak ved sending av epost via Resend: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
-    private String escapeJson(String input) {
-        if (input == null) return "";
-        return input.replace("\\", "\\\\")
-                .replace("\"", "\\\"")
-                .replace("\n", "\\n")
-                .replace("\r", "");
-    }
+    private String buildOrderEmailBody(String customerName, String customerEmail, String customerPhone,
+                                        String deliveryDate, String notes,
+                                        List<CartService.CartItemDTO> cartItems, BigDecimal total, boolean isNewOrder) {
+        StringBuilder body = new StringBuilder();
+        body.append("Hei ").append(customerName).append(",\n\n");
 
-    private String buildOrderEmailContent(String customerName, String customerEmail,
-                                          String customerPhone, String deliveryDate,
-                                          String notes, List<CartService.CartItemDTO> cartItems,
-                                          BigDecimal cartTotal) {
-        StringBuilder content = new StringBuilder();
-        content.append("═══════════════════════\n");
-        content.append("NY BESTILLING!\n");
-        content.append("═══════════════════════\n");
+        if (isNewOrder) {
+            body.append("Takk for din bestilling hos ArtCake AS! Vi er glade for å kunne lage kaken til deg.\n\n");
+        } else {
+            body.append("Takk for at du valgte ArtCake igjen! Her er detaljene for din bestilling:\n\n");
+        }
 
-        content.append("KUNDEINFO:\n");
-        content.append("───────────────────────\n");
-        content.append("Navn: ").append(customerName).append("\n");
-        content.append("Epost: ").append(customerEmail).append("\n");
-        content.append("Telefon: ").append(customerPhone).append("\n");
-        content.append("Ønsket leveringsdato: ").append(deliveryDate).append("\n\n");
+        body.append("KUNDEINFO:\n");
+        body.append("Navn: ").append(customerName).append("\n");
+        body.append("Epost: ").append(customerEmail).append("\n");
+        body.append("Telefon: ").append(customerPhone).append("\n");
+        body.append("Ønsket leveringsdato: ").append(deliveryDate).append("\n\n");
 
-        content.append("BESTILLING:\n");
-        content.append("───────────────────────\n");
+        body.append("═══════════════════════\n");
+        body.append("BESTILLINGSDETAJLER\n");
+        body.append("═══════════════════════\n");
 
         int itemNumber = 1;
         for (CartService.CartItemDTO item : cartItems) {
-            content.append(itemNumber).append(". ");
+            body.append(itemNumber).append(". ");
             if ("standard".equals(item.getItemType())) {
-                content.append(item.getCakeName()).append(" (").append(item.getSizeCm()).append(" cm)\n");
-                content.append("   Pris: ").append(item.getPrice()).append(" kr\n\n");
+                body.append(item.getCakeName()).append(" (").append(item.getSizeCm()).append(" cm)\n");
+                body.append("   Antall: ").append(item.getQuantity()).append("\n");
+                body.append("   Pris per stk: ").append(item.getPrice()).append(" kr\n");
             } else {
-                content.append("PERSONLIG KAKE\n");
-                content.append("   Beskrivelse: ").append(item.getCustomDescription()).append("\n");
-                if (item.getCustomImageUrl() != null && !item.getCustomImageUrl().isEmpty()) {
-                    content.append("   Bilde: Se vedlegg i denne e-posten.\n");
-                }
-                content.append("   Estimert pris: ").append(item.getPrice()).append(" kr\n\n");
+                body.append("Personlig kake\n");
+                body.append("   Beskrivelse:\n");
+                body.append("   ").append(item.getCustomDescription()).append("\n");
+                body.append("   Estimert pris: ").append(item.getPrice()).append(" kr\n");
             }
             itemNumber++;
         }
 
-        content.append("───────────────────────\n");
-        content.append("TOTAL: ").append(cartTotal).append(" kr\n\n");
+        body.append("\n═══════════════════════\n");
+        body.append("Total: ").append(total).append(" kr\n\n");
 
         if (notes != null && !notes.isEmpty()) {
-            content.append("NOTATER:\n");
-            content.append("───────────────────────\n");
-            content.append(notes).append("\n\n");
+            body.append("NOTATER FRA KUNDE:\n");
+            body.append("───────────────────────\n");
+            body.append(notes).append("\n\n");
         }
 
-        content.append("═══════════════════════\n");
-        content.append("Ta kontakt med kunden på: ").append(customerPhone).append("\n");
-        content.append("eller ").append(customerEmail).append("\n");
-        content.append("═══════════════════════\n");
+        body.append("Vi vil kontakte deg snart for å bekrefte detaljer og gi deg en endelig pris.\n\n");
+        body.append("Takk for at du velger ArtCake!\n\n");
+        body.append("Med vennlig hilsen,\nArtCake AS");
 
-        return content.toString();
+        return body.toString();
     }
 
-    private String buildConfirmationEmailContent(String customerName,
-                                                 List<CartService.CartItemDTO> cartItems,
-                                                 BigDecimal cartTotal) {
-        StringBuilder content = new StringBuilder();
-        content.append("Hei ").append(customerName).append("!\n\n");
-        content.append("Takk for din bestilling hos ArtCake AS.\n\n");
-
-        content.append("Vi har mottatt din bestilling med følgende detaljer:\n");
-        content.append("═══════════════════════\n\n");
-
-        int itemNumber = 1;
-        for (CartService.CartItemDTO item : cartItems) {
-            content.append(itemNumber).append(". ");
-            if ("standard".equals(item.getItemType())) {
-                content.append(item.getCakeName()).append(" (").append(item.getSizeCm()).append(" cm)\n");
-                content.append("   Antall: ").append(item.getQuantity()).append("\n");
-                content.append("   Pris per stk: ").append(item.getPrice()).append(" kr\n");
-            } else {
-                content.append("Personlig kake\n");
-                content.append("   Beskrivelse:\n");
-                content.append("   ").append(item.getCustomDescription()).append("\n");
-                content.append("   Estimert pris: ").append(item.getPrice()).append(" kr\n");
-            }
-            itemNumber++;
+    private String resolvePhysicalPath(String url) {
+        if (url == null || url.isEmpty()) {
+            return null;
         }
 
-        content.append("\n═══════════════════════\n");
-        content.append("Total: ").append(cartTotal).append(" kr\n\n");
+        if (url.startsWith("/custom-image/")) {
+            String filename = url.substring("/custom-image/".length());
 
-        content.append("Vi vil kontakte deg snart for å bekrefte detaljer og gi deg en endelig pris.\n\n");
-        content.append("Takk for at du velger ArtCake!\n\n");
-        content.append("Med vennlig hilsen,\nArtCake AS");
-        return content.toString();
+            // Sjekk om vi er i dev
+            if (Files.exists(Paths.get("src", "main", "resources"))) {
+                return Paths.get("src", "main", "resources", "static", "images", "custom-uploads", filename).toString();
+            } else {
+                // Prod
+                return Paths.get("/app/uploads", filename).toString();
+            }
+        }
+
+        if (url.startsWith("/images/custom-uploads/")) {
+             String filename = url.substring("/images/custom-uploads/".length());
+             if (Files.exists(Paths.get("src", "main", "resources"))) {
+                return Paths.get("src", "main", "resources", "static", "images", "custom-uploads", filename).toString();
+            }
+        }
+
+        return null;
     }
 }
