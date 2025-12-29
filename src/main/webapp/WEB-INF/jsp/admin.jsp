@@ -115,14 +115,19 @@
     <c:forEach var="order" items="${orders}">
         <tr>
             <td>
-                <!-- Format orderDate to dd-MM-yyyy. Support both ISO string like 2025-12-24T.. and Date objects -->
+                <!-- Format orderDate (LocalDateTime) to dd-MM-yyyy -->
                 <c:choose>
-                    <c:when test="${not empty order.orderDate and fn:contains(order.orderDate, 'T')}">
-                        <c:set var="dateStr" value="${fn:split(order.orderDate, 'T')[0]}" />
-                        ${fn:substring(dateStr,8,10)}-${fn:substring(dateStr,5,7)}-${fn:substring(dateStr,0,4)}
-                    </c:when>
                     <c:when test="${not empty order.orderDate}">
-                        <fmt:formatDate value="${order.orderDate}" pattern="dd-MM-yyyy" />
+                        <c:set var="orderDateStr" value="${order.orderDate.toString()}" />
+                        <c:choose>
+                            <c:when test="${fn:contains(orderDateStr, 'T')}">
+                                <c:set var="datePart" value="${fn:split(orderDateStr, 'T')[0]}" />
+                                ${fn:substring(datePart, 8, 10)}-${fn:substring(datePart, 5, 7)}-${fn:substring(datePart, 0, 4)}
+                            </c:when>
+                            <c:otherwise>
+                                ${orderDateStr}
+                            </c:otherwise>
+                        </c:choose>
                     </c:when>
                     <c:otherwise>&mdash;</c:otherwise>
                 </c:choose>
@@ -132,14 +137,22 @@
                 <div style="font-size:0.9em; color:#666;">${order.customerPhone}</div>
             </td>
             <td style="font-weight:bold; color:#d35400;">
-                <!-- Format deliveryDate similarly -->
+                <!-- Format deliveryDate (String) to dd-MM-yyyy -->
                 <c:choose>
-                    <c:when test="${not empty order.deliveryDate and fn:contains(order.deliveryDate, 'T')}">
-                        <c:set var="dStr" value="${fn:split(order.deliveryDate, 'T')[0]}" />
-                        ${fn:substring(dStr,8,10)}-${fn:substring(dStr,5,7)}-${fn:substring(dStr,0,4)}
-                    </c:when>
                     <c:when test="${not empty order.deliveryDate}">
-                        <fmt:formatDate value="${order.deliveryDate}" pattern="dd-MM-yyyy" />
+                        <c:set var="dStr" value="${order.deliveryDate}" />
+                        <c:choose>
+                            <c:when test="${fn:contains(dStr, 'T')}">
+                                <c:set var="dPart" value="${fn:split(dStr, 'T')[0]}" />
+                                ${fn:substring(dPart, 8, 10)}-${fn:substring(dPart, 5, 7)}-${fn:substring(dPart, 0, 4)}
+                            </c:when>
+                            <c:when test="${fn:length(dStr) >= 10}">
+                                ${fn:substring(dStr, 8, 10)}-${fn:substring(dStr, 5, 7)}-${fn:substring(dStr, 0, 4)}
+                            </c:when>
+                            <c:otherwise>
+                                ${dStr}
+                            </c:otherwise>
+                        </c:choose>
                     </c:when>
                     <c:otherwise>&mdash;</c:otherwise>
                 </c:choose>
