@@ -77,7 +77,7 @@
 <div id="imageModal" class="image-modal">
   <span class="close" onclick="closeModal()">&times;</span>
   <div id="caption" class="modal-caption"></div>
-  <img class="modal-content" id="modalImg">
+  <img class="modal-content" id="modalImg" src="" alt="Bestillingsbilde">
 </div>
 
 <div class="admin-header">
@@ -115,15 +115,35 @@
     <c:forEach var="order" items="${orders}">
         <tr>
             <td>
-                <%-- Format LocalDateTime to just date --%>
-                <c:set var="dateParts" value="${fn:split(order.orderDate, 'T')}" />
-                ${dateParts[0]}
+                <!-- Format orderDate to dd-MM-yyyy. Support both ISO string like 2025-12-24T.. and Date objects -->
+                <c:choose>
+                    <c:when test="${not empty order.orderDate and fn:contains(order.orderDate, 'T')}">
+                        <c:set var="dateStr" value="${fn:split(order.orderDate, 'T')[0]}" />
+                        ${fn:substring(dateStr,8,10)}-${fn:substring(dateStr,5,7)}-${fn:substring(dateStr,0,4)}
+                    </c:when>
+                    <c:when test="${not empty order.orderDate}">
+                        <fmt:formatDate value="${order.orderDate}" pattern="dd-MM-yyyy" />
+                    </c:when>
+                    <c:otherwise>&mdash;</c:otherwise>
+                </c:choose>
             </td>
             <td>
                 <div style="font-weight:bold;">${order.customerName}</div>
                 <div style="font-size:0.9em; color:#666;">${order.customerPhone}</div>
             </td>
-            <td style="font-weight:bold; color:#d35400;">${order.deliveryDate}</td>
+            <td style="font-weight:bold; color:#d35400;">
+                <!-- Format deliveryDate similarly -->
+                <c:choose>
+                    <c:when test="${not empty order.deliveryDate and fn:contains(order.deliveryDate, 'T')}">
+                        <c:set var="dStr" value="${fn:split(order.deliveryDate, 'T')[0]}" />
+                        ${fn:substring(dStr,8,10)}-${fn:substring(dStr,5,7)}-${fn:substring(dStr,0,4)}
+                    </c:when>
+                    <c:when test="${not empty order.deliveryDate}">
+                        <fmt:formatDate value="${order.deliveryDate}" pattern="dd-MM-yyyy" />
+                    </c:when>
+                    <c:otherwise>&mdash;</c:otherwise>
+                </c:choose>
+            </td>
             <td>
                 <ul style="margin:0; padding-left:20px;">
                     <c:forEach var="item" items="${order.items}">
@@ -141,7 +161,7 @@
                                 <div class="img-link">
                                     <c:set var="pathParts" value="${fn:split(item.customImageUrl, '/')}" />
                                     <c:set var="filename" value="${pathParts[fn:length(pathParts) - 1]}" />
-                                    <%-- Construct the clean URL for ImageController --%>
+                                    <!-- Construct the clean URL for ImageController -->
                                     <c:set var="imgUrl" value="/custom-image/${filename}" />
 
                                     <a href="#" onclick="openModal('${imgUrl}', '${order.customerName}'); return false;">Se bilde</a>
