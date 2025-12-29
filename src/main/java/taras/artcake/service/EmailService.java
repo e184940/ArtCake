@@ -202,7 +202,7 @@ public class EmailService {
         body.append("Hei ").append(customerName).append(",\n\n");
 
         if (isNewOrder) {
-            body.append("Takk for din bestilling hos ArtCake AS! Vi er glade for å kunne lage kaken til deg.\n\n");
+            body.append("Takk for din bestilling hos ArtCake! Vi er glade for å kunne lage kaken til deg.\n\n");
         } else {
             body.append("Takk for at du valgte ArtCake igjen! Her er detaljene for din bestilling:\n\n");
         }
@@ -244,7 +244,7 @@ public class EmailService {
 
         body.append("Vi vil kontakte deg snart for å bekrefte detaljer og gi deg en endelig pris.\n\n");
         body.append("Takk for at du velger ArtCake!\n\n");
-        body.append("Med vennlig hilsen,\nArtCake AS");
+        body.append("Med vennlig hilsen,\nArtCake Studio");
 
         return body.toString();
     }

@@ -7,12 +7,12 @@
     <link href="/css/style.css" rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><spring:message code="custom.title"/> - ArtCake AS</title>
+    <title><spring:message code="custom.title"/> - ArtCake</title>
 </head>
 <body>
 <div class="topmenu">
     <a href="/" class="logo-link">
-        <img src="<c:url value='/images/logo_hvit_nobg.png'/>" alt="ArtCake AS">
+        <img src="<c:url value='/images/logo_hvit_nobg.png'/>" alt="ArtCake Studio AS">
     </a>
     <div class="topmenu-right">
         <a href="/cart" class="cart-link" title="<spring:message code='menu.cart'/>">
