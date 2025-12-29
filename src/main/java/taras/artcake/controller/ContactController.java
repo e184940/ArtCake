@@ -19,8 +19,6 @@ public class ContactController {
     @Autowired
     private EmailService emailService;
 
-    // @GetMapping("/contact") moved to PageController
-
     @PostMapping("/contact/send")
     public String sendContactMessage(@RequestParam String name,
                                      @RequestParam String email,
@@ -41,5 +39,25 @@ public class ContactController {
             ra.addFlashAttribute("contactError", "Det oppstod en feil. Prøv igjen senere.");
             return "redirect:/contact?sent=false";
         }
+    }
+
+    @GetMapping("/contact")
+    public String contact() {
+        return "contact";
+    }
+
+    @GetMapping("/faq")
+    public String faq() {
+        return "faq";
+    }
+
+    @GetMapping("/reviews")
+    public String reviews() {
+        return "reviews";
+    }
+
+    @GetMapping("/terms")
+    public String terms() {
+        return "terms";
     }
 }

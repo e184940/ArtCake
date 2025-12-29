@@ -31,4 +31,8 @@ public class ProductsController {
         return "product-details"; // This JSP should be a fragment, not a full page
     }
 
+    @GetMapping("/")
+    public String home() {
+        return "homepage";
+    }
 }
