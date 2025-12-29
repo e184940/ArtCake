@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="no">
 <head>
@@ -144,7 +145,25 @@
                     <textarea id="notes" name="notes" placeholder="<spring:message code='cart.notes_placeholder'/>"></textarea>
                 </div>
 
-                <button type="submit" class="btn-checkout"><spring:message code="btn.checkout"/></button>
+                <!-- Terms acceptance checkbox - required to enable checkout -->
+                <!-- Build terms string: sentence + (link) -->
+                <spring:message code="terms.accept" var="termsText"/>
+                <!-- Use a dedicated lowercase inline key for replacement so footer.terms remains unchanged -->
+                <spring:message code="terms.inline" var="termsInline"/>
+                <c:url value="/terms" var="termsUrl"/>
+                <c:set var="linkHtml"><a href="${termsUrl}" target="_blank">${termsInline}</a></c:set>
+                <!-- Embed the terms link inside the acceptance sentence: replace the inline label text inside the sentence with an anchor -->
+                <c:set var="cleanTermsText" value="${fn:trim(termsText)}" />
+                <c:set var="cleanTermsLabel" value="${fn:trim(termsInline)}" />
+                <!-- Use fn:replace to swap the plain label text with the HTML link -->
+                <c:set var="termsWithLink" value="${fn:replace(cleanTermsText, cleanTermsLabel, linkHtml)}" />
+
+                <div class="form-group terms-accept">
+                    <input type="checkbox" id="acceptTerms" name="acceptTerms">
+                    <label for="acceptTerms"><c:out value="${termsWithLink}" escapeXml="false"/></label>
+                </div>
+
+                <button type="submit" id="checkoutBtn" class="btn-checkout" disabled><spring:message code="btn.checkout"/></button>
             </form>
         </div>
     </c:if>
@@ -230,6 +249,30 @@
     if (backdrop) {
         backdrop.addEventListener("click", toggleMenu);
     }
+
+    // Toggle checkout button enabled state based on terms acceptance
+    (function() {
+        const acceptCheckbox = document.getElementById('acceptTerms');
+        const checkoutBtn = document.getElementById('checkoutBtn');
+        const checkoutForm = document.querySelector('.checkout-form form');
+
+        if (acceptCheckbox && checkoutBtn) {
+            acceptCheckbox.addEventListener('change', function() {
+                checkoutBtn.disabled = !this.checked;
+            });
+        }
+
+        // Final safety: prevent submit if checkbox is not checked
+        if (checkoutForm) {
+            checkoutForm.addEventListener('submit', function(e) {
+                if (!acceptCheckbox.checked) {
+                    e.preventDefault();
+                    alert('<spring:message code="terms.accept_error"/>');
+                    return false;
+                }
+            });
+        }
+    })();
 </script>
 </body>
 </html>

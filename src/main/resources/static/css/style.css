@@ -1041,6 +1041,65 @@ html, body {
     background: linear-gradient(135deg, #0f5c8f 0%, #083c6f 100%);
 }
 
+/* Terms acceptance checkbox inline styles */
+.checkout-form .terms-accept {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0.75rem 0 1rem 0;
+    vertical-align: middle;
+    white-space: nowrap; /* keep checkbox and label on one line when possible */
+    flex-wrap: wrap; /* allow wrapping when necessary */
+}
+
+/* Force label to be inline next to checkbox (override .form-group label {display:block}) */
+.checkout-form .terms-accept label {
+    display: inline-block;
+    margin: 0;
+    font-size: 0.95rem;
+    color: #222;
+    line-height: 1.2;
+    min-width: 0; /* allow flex children to shrink */
+    overflow-wrap: anywhere; /* allow breaking long words/links */
+    word-break: break-word;
+}
+
+.checkout-form .terms-accept input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    padding: 0;
+    accent-color: #0b4a6a; /* modern supported color for checkbox */
+    border-radius: 3px;
+    flex: 0 0 auto;
+    vertical-align: middle;
+}
+
+.checkout-form .terms-accept a {
+    color: #083c6f;
+    text-decoration: underline;
+}
+
+/* Slightly reduce gap on small screens so label doesn't wrap unnecessarily */
+@media (max-width: 420px) {
+    .checkout-form .terms-accept {
+        gap: 0.4rem;
+        white-space: normal; /* allow wrapping on very small screens */
+        align-items: flex-start;
+    }
+    .checkout-form .terms-accept label {
+        font-size: 0.9rem;
+    }
+}
+
+/* Disabled checkout button visual */
+.btn-checkout[disabled],
+#checkoutBtn[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+    filter: grayscale(0.05);
+}
+
 .description-preview {
     font-size: 0.9rem;
     color: #666;
@@ -1847,3 +1906,59 @@ footer {
         justify-content: flex-end; /* Align to right on mobile cards */
     }
 }
+
+/* Ensure checkout form stacks vertically and terms label can wrap without overflowing */
+.checkout-form form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem; /* small gap between form sections */
+}
+
+.checkout-form .terms-accept {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0.75rem 0 1rem 0;
+    vertical-align: middle;
+    white-space: nowrap; /* keep checkbox and label on one line when possible */
+    flex-wrap: wrap; /* allow wrapping when necessary */
+}
+
+.checkout-form .terms-accept label {
+    display: inline-block;
+    margin: 0;
+    font-size: 0.95rem;
+    color: #222;
+    line-height: 1.2;
+    min-width: 0; /* allow flex children to shrink */
+    overflow-wrap: anywhere; /* allow breaking long words/links */
+    word-break: break-word;
+}
+
+/* Make checkout button always take full width and appear after the terms block */
+#checkoutBtn,
+.btn-checkout {
+    display: block;
+    width: 100%;
+    margin-top: 0.5rem;
+}
+
+@media (max-width: 480px) {
+    /* On very small screens, ensure the terms text wraps under control and checkbox stays aligned */
+    .checkout-form .terms-accept {
+        gap: 0.4rem;
+        white-space: normal; /* allow wrapping */
+        align-items: flex-start;
+    }
+
+    .checkout-form .terms-accept label {
+        font-size: 0.9rem;
+        line-height: 1.2;
+    }
+
+    /* Slightly reduce overall padding of the checkout form on tiny screens */
+    .checkout-form {
+        padding: 1rem;
+    }
+}
+
