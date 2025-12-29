@@ -33,9 +33,9 @@
                 <%-- <a href="/reviews"><spring:message code="menu.reviews"/></a> --%>
                 <div class="lang-switch">
                     <spring:message code="menu.language"/>: <a href="?lang=no"
-                                                               class="${pageContext.request.locale.language == 'no' ? 'active' : ''}">NO</a>
+                                                               class="${currentLang == 'no' ? 'active' : ''}">NO</a>
                     |
-                    <a href="?lang=en" class="${pageContext.request.locale.language == 'en' ? 'active' : ''}">EN</a>
+                    <a href="?lang=en" class="${currentLang == 'en' ? 'active' : ''}">EN</a>
                 </div>
             </nav>
             <div class="menu-backdrop"></div>
@@ -115,36 +115,36 @@
         </div>
 
         <div class="checkout-form">
-            <h3>Fullfør bestilling</h3>
+            <h3><spring:message code="cart.checkout_title"/></h3>
             <form method="POST" action="/cart/checkout">
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="customerName">Navn *</label>
+                        <label for="customerName"><spring:message code="contact.name"/> *</label>
                         <input type="text" id="customerName" name="customerName" required>
                     </div>
                     <div class="form-group">
-                        <label for="customerEmail">Epost *</label>
+                        <label for="customerEmail"><spring:message code="contact.email"/> *</label>
                         <input type="email" id="customerEmail" name="customerEmail" required>
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="customerPhone">Telefon *</label>
+                        <label for="customerPhone"><spring:message code="cart.phone"/> *</label>
                         <input type="tel" id="customerPhone" name="customerPhone" required>
                     </div>
                     <div class="form-group">
-                        <label for="deliveryDate">Ønsket leveringsdato *</label>
+                        <label for="deliveryDate"><spring:message code="cart.delivery_date"/> *</label>
                         <input type="date" id="deliveryDate" name="deliveryDate" required>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="notes">Ekstra ønsker / Notater</label>
-                    <textarea id="notes" name="notes" placeholder="F.eks. spesielle ønsker, allergier, etc."></textarea>
+                    <label for="notes"><spring:message code="cart.notes"/></label>
+                    <textarea id="notes" name="notes" placeholder="<spring:message code='cart.notes_placeholder'/>"></textarea>
                 </div>
 
-                <button type="submit" class="btn-checkout">Bekreft og send bestilling</button>
+                <button type="submit" class="btn-checkout"><spring:message code="btn.checkout"/></button>
             </form>
         </div>
     </c:if>
@@ -152,7 +152,7 @@
 
 <footer>
     <div class="footer-content">
-        <a href="/terms">Vilkår og betingelser for bestilling</a>
+        <a href="/terms"><spring:message code="footer.terms"/></a>
     </div>
 </footer>
 

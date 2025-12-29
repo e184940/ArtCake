@@ -31,8 +31,8 @@
                 <a href="/faq"><spring:message code="menu.faq"/></a>
                 <%-- <a href="/reviews"><spring:message code="menu.reviews"/></a> --%>
                 <div class="lang-switch">
-                    <spring:message code="menu.language"/>: <a href="?lang=no" class="${pageContext.request.locale.language == 'no' ? 'active' : ''}">NO</a> |
-                    <a href="?lang=en" class="${pageContext.request.locale.language == 'en' ? 'active' : ''}">EN</a>
+                    <spring:message code="menu.language"/>: <a href="?lang=no" class="${currentLang == 'no' ? 'active' : ''}">NO</a> |
+                    <a href="?lang=en" class="${currentLang == 'en' ? 'active' : ''}">EN</a>
                 </div>
             </nav>
             <div class="menu-backdrop"></div>
@@ -45,13 +45,32 @@
 
     <div class="products-grid">
         <c:forEach var="cake" items="${cakes}">
+            <!-- choose localized display values -->
+            <c:choose>
+                <c:when test="${param.lang eq 'en' or currentLang eq 'en' and not empty cake.nameEn}">
+                    <c:set var="displayName" value="${cake.nameEn}" />
+                </c:when>
+                <c:otherwise>
+                    <c:set var="displayName" value="${cake.name}" />
+                </c:otherwise>
+            </c:choose>
+
+            <c:choose>
+                <c:when test="${param.lang eq 'en' or currentLang eq 'en' and not empty cake.descriptionEn}">
+                    <c:set var="displayDesc" value="${cake.descriptionEn}" />
+                </c:when>
+                <c:otherwise>
+                    <c:set var="displayDesc" value="${cake.description}" />
+                </c:otherwise>
+            </c:choose>
+
             <div class="product-card">
                 <div class="product-image">
-                    <img src="<c:url value='${cake.imageUrl}'/>" alt="${cake.name}">
+                    <img src="<c:url value='${cake.imageUrl}'/>" alt="${displayName}">
                 </div>
                 <div class="product-info">
-                    <h2>${cake.name}</h2>
-                    <p class="product-description">${cake.description}</p>
+                    <h2>${displayName}</h2>
+                    <p class="product-description">${displayDesc}</p>
                     <p class="product-price"><spring:message code="cart.price"/>: ${cake.minPrice} kr</p>
                     <button class="btn-details" onclick="openModal(${cake.id})"><spring:message code="btn.details"/></button>
                 </div>
@@ -100,7 +119,10 @@
     const modal = document.getElementById("productModal");
 
     function openModal(cakeId) {
-        fetch('/products/' + cakeId + '/details')
+        // preserve language parameter when loading modal content
+        const langParam = new URLSearchParams(window.location.search).get('lang') || '';
+        const url = '/products/' + cakeId + '/details' + (langParam ? ('?lang=' + encodeURIComponent(langParam)) : '');
+        fetch(url, { credentials: 'same-origin' })
             .then(response => response.text())
             .then(html => {
                 document.getElementById('modalBody').innerHTML = html;

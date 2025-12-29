@@ -14,7 +14,7 @@ import taras.artcake.service.EmailService;
 public class ContactController {
 
     @Autowired
-    private MessageRepository messageRepository;
+    private MessageRepository messageRepo;
 
     @Autowired
     private EmailService emailService;
@@ -29,7 +29,7 @@ public class ContactController {
         try {
             // Save message
             Message m = new Message(name, email, message);
-            messageRepository.save(m);
+            messageRepo.save(m);
 
             // Send notification email to konditor
             // We'll use EmailService to send a simple email to artcake

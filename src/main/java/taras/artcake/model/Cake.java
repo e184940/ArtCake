@@ -23,6 +23,12 @@ public class Cake {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Column(name = "name_en")
+    private String nameEn;
+
+    @Column(name = "description_en", columnDefinition = "TEXT")
+    private String descriptionEn;
+
     @Column(name = "image_url")
     private String imageUrl;
 
@@ -77,12 +83,28 @@ public class Cake {
         this.name = name;
     }
 
+    public String getNameEn() {
+        return nameEn;
+    }
+
+    public void setNameEn(String nameEn) {
+        this.nameEn = nameEn;
+    }
+
     public String getDescription() {
         return description;
     }
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getDescriptionEn() {
+        return descriptionEn;
+    }
+
+    public void setDescriptionEn(String descriptionEn) {
+        this.descriptionEn = descriptionEn;
     }
 
     public String getImageUrl() {

@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 import taras.artcake.model.Cake;
 
 @Repository
-public interface CakeRepo extends JpaRepository<Cake, Integer> {
+public interface CakeRepository extends JpaRepository<Cake, Integer> {
 }

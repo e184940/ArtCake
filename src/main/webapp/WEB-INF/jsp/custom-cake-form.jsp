@@ -31,8 +31,8 @@
                 <a href="/faq"><spring:message code="menu.faq"/></a>
                 <%-- <a href="/reviews"><spring:message code="menu.reviews"/></a> --%>
                 <div class="lang-switch">
-                    <spring:message code="menu.language"/>: <a href="?lang=no" class="${pageContext.request.locale.language == 'no' ? 'active' : ''}">NO</a> |
-                    <a href="?lang=en" class="${pageContext.request.locale.language == 'en' ? 'active' : ''}">EN</a>
+                    <spring:message code="menu.language"/>: <a href="?lang=no" class="${currentLang == 'no' ? 'active' : ''}">NO</a> |
+                    <a href="?lang=en" class="${currentLang == 'en' ? 'active' : ''}">EN</a>
                 </div>
             </nav>
             <div class="menu-backdrop"></div>
@@ -57,7 +57,7 @@
         <div class="form-group">
             <label for="inspiration"><spring:message code="custom.form.image"/></label>
             <input type="file" id="inspiration" name="inspiration" accept="image/*">
-            <img id="imagePreview" class="preview-image" style="display: none;">
+            <img id="imagePreview" class="preview-image" src="" alt="Preview image" style="display: none;">
         </div>
 
         <div class="form-group">
