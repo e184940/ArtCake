@@ -20,13 +20,13 @@ public class ProductsController {
     }
 
     @GetMapping("/products/{id}")
-    public String productDetails(@PathVariable Integer id, Model model) {
+    public String productDetails(@PathVariable Long id, Model model) {
         model.addAttribute("cake", cakeRepo.findById(id).orElse(null));
         return "product-details";
     }
 
     @GetMapping("/products/{id}/details")
-    public String getProductDetailsModal(@PathVariable Integer id, Model model) {
+    public String getProductDetailsModal(@PathVariable Long id, Model model) {
         model.addAttribute("cake", cakeRepo.findById(id).orElse(null));
         return "product-details"; // This JSP should be a fragment, not a full page
     }
