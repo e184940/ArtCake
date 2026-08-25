@@ -47,7 +47,7 @@
         <div class="contact-grid">
             <div>
                 <h3><spring:message code="contact.address"/></h3>
-                <p>Art Cake Studio AS<br>Matti Aikios vei 8<br>8019, Bodø</p>
+                <p>Art Cake Studio AS<br>Sulitjelmaveien 6<br>8007, Bodø</p>
                 <br>
 
                 <h3><spring:message code="contact.contact"/></h3>
