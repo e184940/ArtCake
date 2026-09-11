@@ -15,10 +15,6 @@ public class OrderItem {
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
-    @ManyToOne
-    @JoinColumn(name = "cake_id")
-    private Cake cake;
-
     @Column(name = "cake_size_id")
     private Long cakeSizeId;
 
@@ -56,14 +52,6 @@ public class OrderItem {
 
     public void setOrder(Order order) {
         this.order = order;
-    }
-
-    public Cake getCake() {
-        return cake;
-    }
-
-    public void setCake(Cake cake) {
-        this.cake = cake;
     }
 
     public Long getCakeSizeId() {

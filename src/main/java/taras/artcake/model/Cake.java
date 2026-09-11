@@ -1,57 +1,26 @@
 package taras.artcake.model;
 
-import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Entity
-@Table(name = "cakes")
 public class Cake {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
     private String name;
 
-    @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "name_en")
     private String nameEn;
 
-    @Column(name = "description_en", columnDefinition = "TEXT")
     private String descriptionEn;
 
-    @Column(name = "image_url")
     private String imageUrl;
 
-    @Column(name = "image_url_2")
     private String imageUrl2;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "cake_allergens",
-            joinColumns = @JoinColumn(name = "cake_id"),
-            inverseJoinColumns = @JoinColumn(name = "allergen_id")
-    )
-    private Set<Allergen> allergens = new HashSet<>();
+    private Set<Allergen> allergens = Set.of();
 
-    @CreationTimestamp
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
-    @OneToMany(mappedBy = "cake", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<CakeSize> sizes;
 
     public BigDecimal getMinPrice() {
@@ -121,22 +90,6 @@ public class Cake {
 
     public void setAllergens(Set<Allergen> allergens) {
         this.allergens = allergens;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
     }
 
     public List<CakeSize> getSizes() {

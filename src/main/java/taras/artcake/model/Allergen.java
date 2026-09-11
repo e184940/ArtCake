@@ -1,22 +1,9 @@
 package taras.artcake.model;
 
-import jakarta.persistence.*;
-
-import java.util.HashSet;
-import java.util.Set;
-
-@Entity
-@Table(name = "allergens")
 public class Allergen {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
     private String name;
-
-    @ManyToMany(mappedBy = "allergens")
-    private Set<Cake> cakes = new HashSet<>();
 
     public Allergen() {
     }
@@ -37,12 +24,5 @@ public class Allergen {
         this.name = name;
     }
 
-    public Set<Cake> getCakes() {
-        return cakes;
-    }
-
-    public void setCakes(Set<Cake> cakes) {
-        this.cakes = cakes;
-    }
 }
 
