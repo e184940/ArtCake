@@ -28,10 +28,10 @@ public class CakeCatalogService {
         return List.of(
                 cake(1L, "Trippel sjokolade", "Triple chocolate", "Mousse kake som består av tre typer belgisk sjokolade. Mørk, hvit, og melkesjokolade", "/images/trippelsjoko_stykke.jpg", "/images/trippelsjoko_hel.jpg"),
                 cake(2L, "Snickers", "Snickers", "3-lags kake med aromatisk sjokoladebunn av belgisk sjokolade. Fylt med salt karamell, ristede peanøtter, vanilje, og sjokoladekrem", "/images/snickers_stykke.jpg", "/images/snickers_hel.jpg"),
-                cake(3L, "Kirsebaerkake", "Cherry cake", "Myk og saftig bunn av belgisk sjokolade. Fylt med kirsebær, og ostekrem med vanilje", "/images/kirseber_stykke.jpg", "/images/kirseber_hel.jpg"),
-                cake(4L, "Jordbaermilkshake", "Strawberry milkshake", "Deilig bunn med vaniljesmak. Fylt med ostekrem, vanilje, jordbær, og jordbær marmelade", "/images/jordber_milkshake_stykke.jpg", "/images/jordber_milkshake_hel.jpg"),
+                cake(3L, "Kirsebærkake", "Cherry cake", "Myk og saftig bunn av belgisk sjokolade. Fylt med kirsebær, og ostekrem med vanilje", "/images/kirseber_stykke.jpg", "/images/kirseber_hel.jpg"),
+                cake(4L, "Jordbærmilkshake", "Strawberry milkshake", "Deilig bunn med vaniljesmak. Fylt med ostekrem, vanilje, jordbær, og jordbær marmelade", "/images/jordber_milkshake_stykke.jpg", "/images/jordber_milkshake_hel.jpg"),
                 cake(5L, "Honningkake", "Honey cake", "Saftig flerlagskake som består av honningkjeks og hjemmelaget vaniljekrem", "/images/honningkake_stykke.jpg", "/images/honningkake_hel.jpg"),
-                cake(6L, "Bringebaerostekake", "Raspberry cheesecake", "Ostekake med bringegbærcoulis, bringebærkrem, og ekte vanilje", "/images/bringeber_ostekake_stykke.jpg", "/images/bringeber_ostekake_hel.jpg"),
+                cake(6L, "Bringebærostekake", "Raspberry cheesecake", "Ostekake med bringegbærcoulis, bringebærkrem, og ekte vanilje", "/images/bringeber_ostekake_stykke.jpg", "/images/bringeber_ostekake_hel.jpg"),
                 singlePieceCake(7L, "Sjokoladepotet", "Chocolate potato", "Myk sjokoladekake med deilig sjokoladekrem, trukket i kokos.", "/images/sjoko_potet.jpeg"),
                 singlePieceCake(8L, "Eclair", "Eclair", "Luftig vannbakkels fylt med vaniljekrem og toppet med sjokolade.", "/images/eclair.jpeg")
         );
