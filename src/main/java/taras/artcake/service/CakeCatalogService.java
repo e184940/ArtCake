@@ -32,8 +32,8 @@ public class CakeCatalogService {
                 cake(4L, "Jordbaermilkshake", "Strawberry milkshake", "Deilig bunn med vaniljesmak. Fylt med ostekrem, vanilje, jordbær, og jordbær marmelade", "/images/jordber_milkshake_stykke.jpg", "/images/jordber_milkshake_hel.jpg"),
                 cake(5L, "Honningkake", "Honey cake", "Saftig flerlagskake som består av honningkjeks og hjemmelaget vaniljekrem", "/images/honningkake_stykke.jpg", "/images/honningkake_hel.jpg"),
                 cake(6L, "Bringebaerostekake", "Raspberry cheesecake", "Ostekake med bringegbærcoulis, bringebærkrem, og ekte vanilje", "/images/bringeber_ostekake_stykke.jpg", "/images/bringeber_ostekake_hel.jpg"),
-                singlePieceCake(7L, "Sjokoladepotet", "Chocolate potato", "/images/sjoko_potet.jpeg"),
-                singlePieceCake(8L, "Eclair", "Eclair", "/images/eclair.jpeg")
+                singlePieceCake(7L, "Sjokoladepotet", "Chocolate potato", "Myk sjokoladekake med deilig sjokoladekrem, trukket i kokos.", "/images/sjoko_potet.jpeg"),
+                singlePieceCake(8L, "Eclair", "Eclair", "Luftig vannbakkels fylt med vaniljekrem og toppet med sjokolade.", "/images/eclair.jpeg")
         );
     }
 
@@ -56,12 +56,12 @@ public class CakeCatalogService {
         return cake;
     }
 
-    private Cake singlePieceCake(Long id, String name, String nameEn, String imageUrl) {
+    private Cake singlePieceCake(Long id, String name, String nameEn, String description, String imageUrl) {
         Cake cake = new Cake();
         cake.setId(id);
         cake.setName(name);
         cake.setNameEn(nameEn);
-        cake.setDescription("");
+        cake.setDescription(description);
         cake.setDescriptionEn("");
         cake.setImageUrl(imageUrl);
         cake.setAllergens(Set.of());
