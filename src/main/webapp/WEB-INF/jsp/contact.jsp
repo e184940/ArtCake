@@ -47,7 +47,7 @@
         <div class="contact-grid">
             <div>
                 <h3><spring:message code="contact.address"/></h3>
-                <p>Art Cake Studio AS<br>Sulitjelmaveien 6<br>8007, Bodø</p>
+                <p><a href="https://www.google.com/maps/search/?api=1&amp;query=Sulitjelmaveien+6%2C+8007+Bod%C3%B8" target="_blank" rel="noopener noreferrer">Art Cake Studio AS<br>Sulitjelmaveien 6<br>8007 Bodø</a></p>
                 <br>
 
                 <h3><spring:message code="contact.contact"/></h3>
