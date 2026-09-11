@@ -82,7 +82,7 @@
 
         <div class="product-card custom-card">
             <div class="product-image">
-                <img src="/images/customs/IMG_3206.jpg" alt="Custom 5">
+                <img src="/images/customs/sortedame.jpg" alt="Custom 5">
             </div>
         </div>
 
