@@ -46,7 +46,14 @@
                         <label class="size-option">
                             <input type="radio" name="selectedSize" value="${size.id}"
                                    data-price="${size.price}" required>
-                            <span>${size.servings} stykker (${size.sizeCm} cm) - ${size.price} kr</span>
+                            <c:choose>
+                                <c:when test="${size.sizeCm gt 0}">
+                                    <span>${size.servings} stykker (${size.sizeCm} cm) - ${size.price} kr</span>
+                                </c:when>
+                                <c:otherwise>
+                                    <span>${size.servings} stykk - ${size.price} kr</span>
+                                </c:otherwise>
+                            </c:choose>
                         </label>
                     </c:forEach>
                 </div>

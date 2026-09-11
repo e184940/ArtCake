@@ -26,21 +26,23 @@ public class CakeCatalogService {
 
     private List<Cake> createCatalog() {
         return List.of(
-                cake(1L, "Trippel sjokolade", "Triple chocolate", "/images/trippelsjoko_stykke.jpg", "/images/trippelsjoko_hel.jpg"),
-                cake(2L, "Snickers", "Snickers", "/images/snickers_stykke.jpg", "/images/snickers_hel.jpg"),
-                cake(3L, "Kirsebaerkake", "Cherry cake", "/images/kirseber_stykke.jpg", "/images/kirseber_hel.jpg"),
-                cake(4L, "Jordbaermilkshake", "Strawberry milkshake", "/images/jordber_milkshake_stykke.jpg", "/images/jordber_milkshake_hel.jpg"),
-                cake(5L, "Honningkake", "Honey cake", "/images/honningkake_stykke.jpg", "/images/honningkake_hel.jpg"),
-                cake(6L, "Bringebaerostekake", "Raspberry cheesecake", "/images/bringeber_ostekake_stykke.jpg", "/images/bringeber_ostekake_hel.jpg")
+                cake(1L, "Trippel sjokolade", "Triple chocolate", "Mousse kake som består av tre typer belgisk sjokolade. Mørk, hvit, og melkesjokolade", "/images/trippelsjoko_stykke.jpg", "/images/trippelsjoko_hel.jpg"),
+                cake(2L, "Snickers", "Snickers", "3-lags kake med aromatisk sjokoladebunn av belgisk sjokolade. Fylt med salt karamell, ristede peanøtter, vanilje, og sjokoladekrem", "/images/snickers_stykke.jpg", "/images/snickers_hel.jpg"),
+                cake(3L, "Kirsebaerkake", "Cherry cake", "Myk og saftig bunn av belgisk sjokolade. Fylt med kirsebær, og ostekrem med vanilje", "/images/kirseber_stykke.jpg", "/images/kirseber_hel.jpg"),
+                cake(4L, "Jordbaermilkshake", "Strawberry milkshake", "Deilig bunn med vaniljesmak. Fylt med ostekrem, vanilje, jordbær, og jordbær marmelade", "/images/jordber_milkshake_stykke.jpg", "/images/jordber_milkshake_hel.jpg"),
+                cake(5L, "Honningkake", "Honey cake", "Saftig flerlagskake som består av honningkjeks og hjemmelaget vaniljekrem", "/images/honningkake_stykke.jpg", "/images/honningkake_hel.jpg"),
+                cake(6L, "Bringebaerostekake", "Raspberry cheesecake", "Ostekake med bringegbærcoulis, bringebærkrem, og ekte vanilje", "/images/bringeber_ostekake_stykke.jpg", "/images/bringeber_ostekake_hel.jpg"),
+                singlePieceCake(7L, "Sjokoladepotet", "Chocolate potato", "/images/sjoko_potet.jpeg"),
+                singlePieceCake(8L, "Eclair", "Eclair", "/images/eclair.jpeg")
         );
     }
 
-    private Cake cake(Long id, String name, String nameEn, String imageUrl, String imageUrl2) {
+    private Cake cake(Long id, String name, String nameEn, String description, String imageUrl, String imageUrl2) {
         Cake cake = new Cake();
         cake.setId(id);
         cake.setName(name);
         cake.setNameEn(nameEn);
-        cake.setDescription("");
+        cake.setDescription(description);
         cake.setDescriptionEn("");
         cake.setImageUrl(imageUrl);
         cake.setImageUrl2(imageUrl2);
@@ -51,6 +53,19 @@ public class CakeCatalogService {
                 size((int) (id * 10 + 3), "20", 25, 899),
                 size((int) (id * 10 + 4), "25", 28, 1099)
         ));
+        return cake;
+    }
+
+    private Cake singlePieceCake(Long id, String name, String nameEn, String imageUrl) {
+        Cake cake = new Cake();
+        cake.setId(id);
+        cake.setName(name);
+        cake.setNameEn(nameEn);
+        cake.setDescription("");
+        cake.setDescriptionEn("");
+        cake.setImageUrl(imageUrl);
+        cake.setAllergens(Set.of());
+        cake.setSizes(List.of(size((int) (id * 10 + 1), "1", 0, 49)));
         return cake;
     }
 
