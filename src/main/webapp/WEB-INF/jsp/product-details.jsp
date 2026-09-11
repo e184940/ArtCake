@@ -36,7 +36,7 @@
         <!-- Localized description -->
         <p class="modal-description">${displayDesc}</p>
 
-        <p class="modal-price"><spring:message code="cart.price"/>: ${cake.minPrice} kr</p>
+        <p class="modal-price"><spring:message code="product.from_price"/> ${cake.minPrice} kr</p>
 
         <div class="sizes-section">
             <h3><spring:message code="detailsize"/>:</h3>
@@ -46,7 +46,7 @@
                         <label class="size-option">
                             <input type="radio" name="selectedSize" value="${size.id}"
                                    data-price="${size.price}" required>
-                            <span>${size.sizeCm} cm - ${size.price} kr</span>
+                            <span>${size.servings} stykker (${size.sizeCm} cm) - ${size.price} kr</span>
                         </label>
                     </c:forEach>
                 </div>

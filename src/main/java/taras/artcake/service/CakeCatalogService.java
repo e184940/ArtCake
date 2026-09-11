@@ -46,15 +46,18 @@ public class CakeCatalogService {
         cake.setImageUrl2(imageUrl2);
         cake.setAllergens(Set.of());
         cake.setSizes(List.of(
-                size((int) (id * 10 + 1), 18, 450),
-                size((int) (id * 10 + 2), 24, 650)
+                size((int) (id * 10 + 1), "8-10", 18, 549),
+                size((int) (id * 10 + 2), "12-14", 20, 649),
+                size((int) (id * 10 + 3), "20", 25, 899),
+                size((int) (id * 10 + 4), "25", 28, 1099)
         ));
         return cake;
     }
 
-    private CakeSize size(int id, int sizeCm, int price) {
+    private CakeSize size(int id, String servings, int sizeCm, int price) {
         CakeSize size = new CakeSize();
         size.setId(id);
+        size.setServings(servings);
         size.setSizeCm(sizeCm);
         size.setPrice(BigDecimal.valueOf(price));
         return size;

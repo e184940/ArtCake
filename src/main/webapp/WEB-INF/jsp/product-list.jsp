@@ -71,7 +71,7 @@
                 <div class="product-info">
                     <h2>${displayName}</h2>
                     <p class="product-description">${displayDesc}</p>
-                    <p class="product-price"><spring:message code="cart.price"/>: ${cake.minPrice} kr</p>
+                    <p class="product-price"><spring:message code="product.from_price"/> ${cake.minPrice} kr</p>
                     <button class="btn-details" onclick="openModal(${cake.id})"><spring:message code="btn.details"/></button>
                 </div>
             </div>
